@@ -34,7 +34,7 @@ class QuizComponent extends React.Component {
   }
 
   render() {
-    const {classes, countries} = this.props;
+    const {classes} = this.props;
     const {pickedCountries, correctCountry, totalCorrect, totalAnswered} = this.state;
 
     return (
