@@ -36,7 +36,7 @@ function MenuComponent() {
           </IconButton>
         </Tooltip>
         <Tooltip title="GitHub repository">
-          <IconButton aria-label="GitHub" href="https://github.com/Ruben9922/permissions-calculator" color="inherit">
+          <IconButton aria-label="GitHub" href="https://github.com/Ruben9922/flags-quiz" color="inherit">
             <GitHubIcon/>
           </IconButton>
         </Tooltip>
