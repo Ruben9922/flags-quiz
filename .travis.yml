@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+- 14
+script:
+- npm run build
+deploy:
+  provider: netlify
+  site: bfed1985-60e9-4a06-862a-bf784963614d
+  auth:
+    secure: Brj1kVg8fnCFj3ACJsFyPKtQ8cm7Xc+78Mm6ZJ4pscCJQm1vEs7v2HHXnOPOG9aBXFGWeD7WIGb5MiNwA+Emi/Se7Ccp6/ZXAxj1QqtKKqHCsI6wY+zTifciYJMMn/HCvZmeQJkX0xjAqsGP8qVLVLwe0fF94puH8FjduLkAzkdQ7R90bBsfCM1438c/8NdffBzeXWEpR82FwUemzbS2qYCBxO+7A48nwWMm5U44AxGAsC1Kp1Qz9voI6TR4/C4g8/qOhn23Z/EhfoUTS9tKCrY3J9Ea6Xy2F+GhoTtsMy2fiSoRpV9s3TJRy7lQNpFmOf2qNDyHyVFDejIu4NN23D0N7zbS5pSKDmXUMir+x22BspQDhZu7d1n4tzpEckNyJRtOAcO/j3sJfiqQFlQXzW+5GNM2lditwWIVQGOsvq96ZCo85tW6dxv2e3hcEwTvzWi/x5QSlqkR2Xue0qXjfx4eLAYvKqikibC37BR+q0148n3B1Vh0bNCgNFctlKJ555mohixCiqLn4s6hiH4J4cIzCZLJ7eC7ZEAXWjMPrIVdoLvNNQ3rma1Mm6eWPmkIV7yFbY+efycnBSVA19w8QN7VL+X2kWsNdy/p4Nu84eKXlzDGhQE7E2ISVBVXRNS0S+0/Cy6I4sMC/WK/4mtATAIQmctppx2JoKNWZ2/KzBs=
+  prod: true
+  dir: build/
+  edge: true
