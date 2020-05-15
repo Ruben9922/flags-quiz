@@ -34,12 +34,13 @@ class QuizComponent extends React.Component {
       totalAnswered: 0,
       correctSnackbarOpen: false,
       incorrectSnackbarOpen: false,
+      prevCorrectCountry: null,
     };
   }
 
   render() {
     const {classes} = this.props;
-    const {pickedCountries, correctCountry, totalCorrect, totalAnswered, correctSnackbarOpen, incorrectSnackbarOpen} = this.state;
+    const {pickedCountries, correctCountry, totalCorrect, totalAnswered, correctSnackbarOpen, incorrectSnackbarOpen, prevCorrectCountry} = this.state;
 
     return (
       <>
@@ -72,7 +73,10 @@ class QuizComponent extends React.Component {
         </Snackbar>
         <Snackbar key={totalAnswered} open={incorrectSnackbarOpen} autoHideDuration={1000} onClose={(...args) => this.handleSnackbarClose(...args)}>
           <Alert severity="error" elevation={6} variant="filled">
-            Incorrect!
+            Incorrect!&nbsp;
+            {prevCorrectCountry && (
+              <span>It's the flag of {prevCorrectCountry.name}</span>
+            )}.
           </Alert>
         </Snackbar>
       </>
@@ -92,6 +96,7 @@ class QuizComponent extends React.Component {
         totalAnswered: state.totalAnswered + 1,
         correctSnackbarOpen: isCorrect,
         incorrectSnackbarOpen: !isCorrect,
+        prevCorrectCountry: state.correctCountry,
       };
     });
   }
