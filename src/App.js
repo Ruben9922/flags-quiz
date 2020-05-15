@@ -54,7 +54,7 @@ class App extends React.Component {
     let content;
     if (error) {
       content =
-        <Alert severity="error">
+        <Alert severity="error" elevation={6} variant="filled">
           <AlertTitle>Error</AlertTitle>
           Failed to load country/territory data.
         </Alert>;
