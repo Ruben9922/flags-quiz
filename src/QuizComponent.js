@@ -76,8 +76,8 @@ class QuizComponent extends React.Component {
           <Alert severity="error" elevation={6} variant="filled">
             Incorrect!&nbsp;
             {prevCorrectCountry && (
-              <span>It's the flag of {prevCorrectCountry.name}</span>
-            )}.
+              <span>It's the flag of {prevCorrectCountry.name}.</span>
+            )}
           </Alert>
         </Snackbar>
       </>
