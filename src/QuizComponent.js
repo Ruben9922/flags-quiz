@@ -35,12 +35,13 @@ class QuizComponent extends React.Component {
       correctSnackbarOpen: false,
       incorrectSnackbarOpen: false,
       prevCorrectCountry: null,
+      answered: false,
     };
   }
 
   render() {
     const {classes} = this.props;
-    const {pickedCountries, correctCountry, totalCorrect, totalAnswered, correctSnackbarOpen, incorrectSnackbarOpen, prevCorrectCountry} = this.state;
+    const {pickedCountries, correctCountry, totalCorrect, totalAnswered, correctSnackbarOpen, incorrectSnackbarOpen, prevCorrectCountry, answered} = this.state;
 
     return (
       <>
@@ -55,8 +56,8 @@ class QuizComponent extends React.Component {
           <Grid container className={classes.root}>
             {pickedCountries.map(country => (
               <Grid item xs={6}>
-                <Card onClick={() => this.handleClick(country)} style={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column', width: "100%"}}>
-                  <CardActionArea>
+                <Card style={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column', width: "100%"}}>
+                  <CardActionArea disabled={answered} onClick={() => this.handleClick(country)}>
                     <Typography variant="body1">
                       {country.name}
                     </Typography>
@@ -84,21 +85,28 @@ class QuizComponent extends React.Component {
   }
 
   handleClick(country) {
-    let pickedCountries = this.pickCountries();
-    let correctCountry = this.chooseElement(pickedCountries);
-
     this.setState(state => {
       let isCorrect = (country === state.correctCountry);
       return {
-        pickedCountries: pickedCountries,
-        correctCountry: correctCountry,
         totalCorrect: isCorrect ? state.totalCorrect + 1 : state.totalCorrect,
         totalAnswered: state.totalAnswered + 1,
         correctSnackbarOpen: isCorrect,
         incorrectSnackbarOpen: !isCorrect,
         prevCorrectCountry: state.correctCountry,
+        answered: true,
       };
     });
+
+    setTimeout(() => {
+      let pickedCountries = this.pickCountries();
+      let correctCountry = this.chooseElement(pickedCountries);
+
+      this.setState({
+        pickedCountries: pickedCountries,
+        correctCountry: correctCountry,
+        answered: false,
+      });
+    }, 1500);
   }
 
   handleSnackbarClose(event, reason) {
