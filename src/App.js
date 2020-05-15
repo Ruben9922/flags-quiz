@@ -54,10 +54,12 @@ class App extends React.Component {
     let content;
     if (error) {
       content =
-        <Alert severity="error" elevation={6} variant="filled">
-          <AlertTitle>Error</AlertTitle>
-          Failed to load country/territory data.
-        </Alert>;
+        <Container maxWidth="md" style={{marginTop: "5em"}}>
+          <Alert severity="error" elevation={6} variant="filled">
+            <AlertTitle>Error</AlertTitle>
+            Failed to load country/territory data.
+          </Alert>
+        </Container>;
     } else if (!isLoaded) {
       content =
         <Backdrop className={classes.backdrop} open>
@@ -70,9 +72,7 @@ class App extends React.Component {
     return (
       <>
         <AppBarComponent/>,
-        <Container maxWidth="md" style={{marginTop: "5em"}}>
-          {content}
-        </Container>
+        {content}
       </>
     );
   }
