@@ -56,7 +56,7 @@ class App extends React.Component {
       content =
         <Alert severity="error">
           <AlertTitle>Error</AlertTitle>
-          Failed to load country data.
+          Failed to load country/territory data.
         </Alert>;
     } else if (!isLoaded) {
       content =
