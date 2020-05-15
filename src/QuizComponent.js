@@ -8,10 +8,11 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import Typography from "@material-ui/core/Typography";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
+import Button from "@material-ui/core/Button";
 
 const styles = theme => ({
   root: {
-    flexGrow: 1,
+    // flexGrow: 1,
   },
   paper: {
     padding: theme.spacing(2),
@@ -45,7 +46,7 @@ class QuizComponent extends React.Component {
 
     return (
       <>
-        <Container maxWidth="md" style={{marginTop: "4em", textAlign: "center"}}>
+        <Container maxWidth="lg" style={{marginTop: "4em", textAlign: "center"}}>
           <Typography paragraph>
             Score: {totalCorrect}/{totalAnswered}
           </Typography>
@@ -53,16 +54,13 @@ class QuizComponent extends React.Component {
             fontSize: '10em',
             lineHeight: '10em',
           }}/>
-          <Grid container className={classes.root}>
+          <Grid container className={classes.root} spacing={2} justify="center" alignItems="baseline">
             {pickedCountries.map(country => (
-              <Grid item xs={6}>
-                <Card style={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column', width: "100%"}}>
-                  <CardActionArea disabled={answered} onClick={() => this.handleClick(country)}>
-                    <Typography variant="body1">
-                      {country.name}
-                    </Typography>
-                  </CardActionArea>
-                </Card>
+              <Grid item>
+                <Button variant="contained" color="primary" size="large" disabled={answered} onClick={() => this.handleClick(country)}
+                style={{width: "250px", minHeight: "80px"}}>
+                  {country.name}
+                </Button>
               </Grid>
             ))}
           </Grid>
