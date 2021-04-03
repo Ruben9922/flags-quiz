@@ -1,7 +1,6 @@
 import React from "react";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import HomeIcon from "@material-ui/icons/Home";
@@ -27,9 +26,7 @@ function AppBarComponent() {
         {/*  <CodeIcon />*/}
         {/*</IconButton>*/}
         <Typography variant="h6" className={classes.title}>
-          <Link href="/" color="inherit" underline="none">
-            Flags Quiz
-          </Link>
+          Flags Quiz
         </Typography>
         <Tooltip title="Go to main website">
           <IconButton aria-label="home" href="https://rubendougall.co.uk/" color="inherit">
