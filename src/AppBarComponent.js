@@ -7,16 +7,17 @@ import IconButton from "@material-ui/core/IconButton";
 import HomeIcon from "@material-ui/icons/Home";
 import GitHubIcon from "@material-ui/icons/GitHub";
 import AppBar from "@material-ui/core/AppBar";
-import {makeStyles} from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 
-function MenuComponent() {
-  const useStyles = makeStyles(theme => ({
-    title: {
-      flexGrow: 1,
-      marginTop: "initial",
-      marginBottom: "initial",
-    },
-  }));
+const useStyles = makeStyles(theme => ({
+  title: {
+    flexGrow: 1,
+    marginTop: "initial",
+    marginBottom: "initial",
+  },
+}));
+
+function AppBarComponent() {
   const classes = useStyles();
 
   return (
@@ -45,4 +46,4 @@ function MenuComponent() {
   );
 }
 
-export default MenuComponent;
+export default AppBarComponent;
