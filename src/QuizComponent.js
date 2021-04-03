@@ -122,7 +122,7 @@ class QuizComponent extends React.Component {
     let pickedCountries = []
     const count = 4;
     for (let i = 0; i < count; i++) {
-      let country = countries[Math.floor(Math.random() * countries.length)];
+      let country = this.chooseElement(countries);
       pickedCountries.push(country)
     }
 
