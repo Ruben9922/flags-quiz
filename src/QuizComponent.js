@@ -3,8 +3,6 @@ import Container from "@material-ui/core/Container";
 import ReactCountryFlag from "react-country-flag";
 import Grid from "@material-ui/core/Grid";
 import {withStyles} from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardActionArea from "@material-ui/core/CardActionArea";
 import Typography from "@material-ui/core/Typography";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
