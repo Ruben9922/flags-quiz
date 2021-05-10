@@ -37,6 +37,16 @@ export function isAnswerCorrect(answer) {
 }
 
 function reducer(draft, action) {
+  const resetQuestion = () => {
+    const pickedCountries = pickCountries(action.countries);
+
+    draft.currentQuestion = {
+      countries: pickedCountries,
+      correctCountry: chooseElement(pickedCountries),
+    };
+    draft.answered = false;
+  }
+
   switch (action.type) {
     case "answer":
       const answer = {
@@ -53,19 +63,18 @@ function reducer(draft, action) {
       draft.answered = true;
 
       return;
-    case "reset":
-      const pickedCountries = pickCountries(action.countries);
-
-      draft.currentQuestion = {
-        countries: pickedCountries,
-        correctCountry: chooseElement(pickedCountries),
-      };
-      draft.answered = false;
+    case "resetQuestion":
+      resetQuestion();
 
       return;
     case "closeSnackbar":
       draft.correctSnackbarOpen = false;
       draft.incorrectSnackbarOpen = false;
+
+      return;
+    case "reset":
+      draft.answers = [];
+      resetQuestion();
 
       return;
   }
@@ -92,7 +101,7 @@ function QuizComponent({ countries }) {
               currentQuestion={state.currentQuestion}
               answers={state.answers}
               answer={country => dispatch({ type: "answer", country })}
-              reset={() => dispatch({ type: "reset", countries })}
+              resetQuestion={() => dispatch({ type: "resetQuestion", countries })}
               answered={state.answered}
             />
             <Button variant="contained" onClick={() => setView("summary")} style={{ marginTop: "25px" }}>
@@ -103,7 +112,10 @@ function QuizComponent({ countries }) {
           <>
             <SummaryComponent answers={state.answers} />
             <div style={{textAlign: "center"}}>
-              <Button variant="contained" onClick={() => setView("question")} style={{ marginTop: "25px" }}>
+              <Button
+                variant="contained"
+                style={{ marginTop: "25px" }}
+                onClick={() => { setView("question"); dispatch({ type: "reset", countries }); }}>
                 Play again
               </Button>
             </div>

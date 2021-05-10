@@ -11,11 +11,11 @@ function QuestionComponent({
   currentQuestion,
   answered,
   answer,
-  reset,
+  resetQuestion,
 }) {
   const handleClick = country => {
     answer(country);
-    setTimeout(reset, 1500);
+    setTimeout(resetQuestion, 1500);
   };
 
   return (
