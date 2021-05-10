@@ -46,36 +46,29 @@ function SummaryComponent({answers}) {
           </AccordionSummary>
           <AccordionDetails>
             <Grid container direction="row" spacing={3} alignItems="center">
-              <Grid item md={4}>
+              <Grid item md={2}>
                 <ReactCountryFlag
                   countryCode={answer.correctCountry.alpha2Code}
                   svg={!emojiSupport()}
-                  // svg
                   style={{
                     fontSize: "6em",
-                    // lineHeight: "4em",
                   }}
                 />
               </Grid>
               {isAnswerCorrect(answer) ? (
                 <Grid item md>
-                  {/*<Typography paragraph>*/}
+                  <p>
                     {answer.correctCountry.name}
-                  {/*</Typography>*/}
+                  </p>
                 </Grid>
               ) : (
-                <>
-                  <Grid item md>
-                    {/*<Typography paragraph>*/}
-                      Actual: {answer.correctCountry.name}
-                    {/*</Typography>*/}
-                  </Grid>
-                  <Grid item md>
-                    {/*<Typography paragraph>*/}
-                      Selected: {answer.selectedCountry.name}
-                    {/*</Typography>*/}
-                  </Grid>
-                </>
+                <Grid item md>
+                  <p>
+                    {answer.correctCountry.name} &mdash; correct answer
+                    <br/>
+                    {answer.selectedCountry.name} &mdash; selected answer
+                  </p>
+                </Grid>
               )}
             </Grid>
           </AccordionDetails>
