@@ -7,5 +7,4 @@ deploy:
   provider: netlify
   site: bfed1985-60e9-4a06-862a-bf784963614d
   prod: true
-  dir: build/
   edge: true
