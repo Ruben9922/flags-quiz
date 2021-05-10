@@ -77,6 +77,7 @@ function reducer(draft, action) {
       resetQuestion();
 
       return;
+    // no default
   }
 }
 
