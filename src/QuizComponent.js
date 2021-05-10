@@ -1,25 +1,12 @@
 import React from 'react';
 import Container from "@material-ui/core/Container";
-import ReactCountryFlag from "react-country-flag";
-import Grid from "@material-ui/core/Grid";
-import {makeStyles} from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
-import { useImmerReducer } from "use-immer";
+import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    // flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-}));
+import QuestionComponent from "./QuestionComponent";
+import SummaryComponent from "./SummaryComponent";
 
 function pickCountries(countries) {
   const count = 4;
@@ -34,35 +21,45 @@ function init(countries) {
   const pickedCountries = pickCountries(countries);
 
   return {
-    pickedCountries: pickedCountries,
-    correctCountry: chooseElement(pickedCountries),
-    totalCorrect: 0,
-    totalAnswered: 0,
+    currentQuestion: {
+      countries: pickedCountries,
+      correctCountry: chooseElement(pickedCountries),
+    },
+    answers: [],
     correctSnackbarOpen: false,
     incorrectSnackbarOpen: false,
-    prevCorrectCountry: null,
     answered: false,
   };
+}
+
+export function isAnswerCorrect(answer) {
+  return R.equals(answer.correctCountry, answer.selectedCountry);
 }
 
 function reducer(draft, action) {
   switch (action.type) {
     case "answer":
-      const isCorrect = R.equals(action.country, draft.correctCountry);
+      const answer = {
+        countries: draft.currentQuestion.countries,
+        correctCountry: draft.currentQuestion.correctCountry,
+        selectedCountry: action.country,
+      };
+      const isCorrect = isAnswerCorrect(answer);
 
-      draft.totalCorrect = isCorrect ? draft.totalCorrect + 1 : draft.totalCorrect;
-      draft.totalAnswered = draft.totalAnswered + 1;
+      draft.answers = R.append(answer, draft.answers);
       draft.correctSnackbarOpen = isCorrect;
       draft.incorrectSnackbarOpen = !isCorrect;
-      draft.prevCorrectCountry = draft.correctCountry;
+      // draft.currentQuestion = null;
       draft.answered = true;
 
       return;
-    case "timerElapsed":
+    case "reset":
       const pickedCountries = pickCountries(action.countries);
 
-      draft.pickedCountries = pickedCountries;
-      draft.correctCountry = chooseElement(pickedCountries);
+      draft.currentQuestion = {
+        countries: pickedCountries,
+        correctCountry: chooseElement(pickedCountries),
+      };
       draft.answered = false;
 
       return;
@@ -75,14 +72,8 @@ function reducer(draft, action) {
 }
 
 function QuizComponent({ countries }) {
-  const classes = useStyles();
-
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
-
-  const handleClick = country => {
-    dispatch({ type: "answer", country });
-    setTimeout(() => dispatch({ type: "timerElapsed", countries }), 1500);
-  };
+  const [view, setView] = React.useState("question");
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -94,39 +85,33 @@ function QuizComponent({ countries }) {
 
   return (
     <>
-      <Container maxWidth="lg" style={{marginTop: "6em", textAlign: "center"}}>
-        <Typography paragraph>
-          Score: {state.totalCorrect}/{state.totalAnswered}
-        </Typography>
-        <ReactCountryFlag countryCode={state.correctCountry.alpha2Code} svg style={{
-          fontSize: '10em',
-          lineHeight: '10em',
-        }}/>
-        <Grid
-          container
-          className={classes.root}
-          spacing={2}
-          justify="center"
-          alignItems="baseline"
-        >
-          {state.pickedCountries.map((country, index) => (
-            <Grid item key={index}>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                disabled={state.answered}
-                onClick={() => handleClick(country)}
-                style={{width: "250px", minHeight: "80px"}}
-              >
-                {country.name}
+      <Container maxWidth="lg" style={{marginTop: "6em"}}>
+        {view !== "summary" ? (
+          <div style={{textAlign: "center"}}>
+            <QuestionComponent
+              currentQuestion={state.currentQuestion}
+              answers={state.answers}
+              answer={country => dispatch({ type: "answer", country })}
+              reset={() => dispatch({ type: "reset", countries })}
+              answered={state.answered}
+            />
+            <Button variant="contained" onClick={() => setView("summary")} style={{ marginTop: "25px" }}>
+              End game
+            </Button>
+          </div>
+        ) : (
+          <>
+            <SummaryComponent answers={state.answers} />
+            <div style={{textAlign: "center"}}>
+              <Button variant="contained" onClick={() => setView("question")} style={{ marginTop: "25px" }}>
+                Play again
               </Button>
-            </Grid>
-          ))}
-        </Grid>
+            </div>
+          </>
+        )}
       </Container>
       <Snackbar
-        key={state.totalAnswered}
+        key={R.length(state.answers)}
         open={state.correctSnackbarOpen}
         autoHideDuration={1000}
         onClose={handleSnackbarClose}
@@ -136,15 +121,15 @@ function QuizComponent({ countries }) {
         </Alert>
       </Snackbar>
       <Snackbar
-        key={state.totalAnswered}
+        key={R.length(state.answers)}
         open={state.incorrectSnackbarOpen}
         autoHideDuration={1000}
         onClose={handleSnackbarClose}
       >
         <Alert severity="error" elevation={6} variant="filled">
           Incorrect!
-          {state.prevCorrectCountry && (
-            <>&nbsp;It's the flag of {state.prevCorrectCountry.name}.</>
+          {R.last(state.answers)?.correctCountry && (
+            <>&nbsp;It's the flag of {R.last(state.answers)?.correctCountry.name}.</>
           )}
         </Alert>
       </Snackbar>
