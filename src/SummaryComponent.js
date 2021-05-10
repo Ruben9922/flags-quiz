@@ -9,6 +9,7 @@ import {isAnswerCorrect} from "./QuizComponent";
 import ReactCountryFlag from "react-country-flag";
 import Grid from "@material-ui/core/Grid";
 import emojiSupport from "detect-emoji-support";
+import * as R from "ramda";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,7 +35,11 @@ function SummaryComponent({answers}) {
         Summary
       </Typography>
       <div className={classes.root}>
-      {answers.map((answer, index) => (
+      {R.isEmpty(answers) ? (
+        <Typography>
+          No answers to show.
+        </Typography>
+      ) : answers.map((answer, index) => (
         <Accordion key={index}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
