@@ -10,6 +10,8 @@ import ReactCountryFlag from "react-country-flag";
 import Grid from "@material-ui/core/Grid";
 import emojiSupport from "detect-emoji-support";
 import * as R from "ramda";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,6 +36,20 @@ function SummaryComponent({answers}) {
       <Typography variant="h5" component="h1" gutterBottom>
         Summary
       </Typography>
+      <Grid container spacing={3} justify="center">
+        <Grid item xs={6} sm={5} md={4} lg={3}>
+          <Card style={{ textAlign: "center", marginBottom: "25px" }}>
+            <CardContent>
+              <Typography color="textSecondary" gutterBottom>
+                Score
+              </Typography>
+              <Typography variant="h5" component="h2">
+                {R.length(R.filter(isAnswerCorrect, answers))}/{R.length(answers)} ({(R.length(R.filter(isAnswerCorrect, answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
       <div className={classes.root}>
       {R.isEmpty(answers) ? (
         <Typography>
