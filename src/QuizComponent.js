@@ -7,6 +7,10 @@ import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
 import QuestionComponent from "./QuestionComponent";
 import SummaryComponent from "./SummaryComponent";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
 
 function pickCountries(countries) {
   const count = 4;
@@ -84,6 +88,7 @@ function reducer(draft, action) {
 function QuizComponent({ countries }) {
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
   const [view, setView] = React.useState("question");
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -105,7 +110,7 @@ function QuizComponent({ countries }) {
               resetQuestion={() => dispatch({ type: "resetQuestion", countries })}
               answered={state.answered}
             />
-            <Button variant="contained" onClick={() => setView("summary")} style={{ marginTop: "25px" }}>
+            <Button variant="contained" onClick={() => setDialogOpen(true)} style={{ marginTop: "25px" }}>
               End game
             </Button>
           </div>
@@ -146,6 +151,26 @@ function QuizComponent({ countries }) {
           )}
         </Alert>
       </Snackbar>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you wish to end the game?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => { setView("summary"); setDialogOpen(false); }} color="primary" autoFocus>
+            End game
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
