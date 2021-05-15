@@ -13,8 +13,16 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 
 function pickCountries(countries) {
-  const count = 4;
-  return R.map(() => chooseElement(countries), R.range(0, count));
+  const count = 4; // Technically, count must be less than the number of countries
+  let pickedCountries = [];
+  for (let i = 0; i < count; i++) {
+    // Choose an element from countries list with the already picked countries removed
+    // Could be made more efficient by removing by index; for this you would have to store the list of available
+    // countries and remove from this each time
+    const pickedCountry = chooseElement(R.without(pickedCountries, countries));
+    pickedCountries = R.append(pickedCountry, pickedCountries);
+  }
+  return pickedCountries;
 }
 
 function chooseElement(l) {
