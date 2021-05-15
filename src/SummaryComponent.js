@@ -12,6 +12,7 @@ import emojiSupport from "detect-emoji-support";
 import * as R from "ramda";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
+import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -37,9 +38,20 @@ function SummaryComponent({answers}) {
         Summary
       </Typography>
         {R.isEmpty(answers) ? (
-          <Typography>
-            No answers to show.
-          </Typography>
+          <>
+            <Typography>
+              No answers to show.
+            </Typography>
+            <Grid container style={{marginTop: "2.5em", marginBottom: "1em"}} justify="center" spacing={3}>
+              <Grid item xs={8} sm={6} md={4} style={{ textAlign: "center" }}>
+                <img
+                  src={EmptyStreetSplash}
+                  alt="Empty street splash image"
+                  style={{ width: "100%" }}
+                />
+              </Grid>
+            </Grid>
+          </>
         ) : (
           <>
             <Grid container spacing={3} justify="center">
