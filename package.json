@@ -16,6 +16,7 @@
     "react-country-flag": "^2.1.0",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "react-vis": "^1.11.7",
     "use-http": "^1.0.19",
     "use-immer": "^0.5.1"
   },

@@ -13,6 +13,8 @@ import * as R from "ramda";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
+import {FlexibleWidthXYPlot, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, XYPlot, YAxis} from "react-vis";
+import '../node_modules/react-vis/dist/style.css';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,6 +34,19 @@ const useStyles = makeStyles(theme => ({
 function SummaryComponent({answers}) {
   const classes = useStyles();
 
+  const cumulativeScoreChartData = R.addIndex(R.map)(
+    (value, index) => ({ x: index, y: value }),
+    R.reduce(
+      (acc, value) => R.append(
+        (R.isEmpty(acc) ? 0 : R.last(acc)) + (isAnswerCorrect(value) ? 1 : 0),
+        acc
+      ),
+      [0],
+      answers
+    )
+  );
+
+  console.log(cumulativeScoreChartData);
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>
@@ -64,6 +79,21 @@ function SummaryComponent({answers}) {
                     <Typography variant="h5" component="h2">
                       {R.length(R.filter(isAnswerCorrect, answers))}/{R.length(answers)} ({(R.length(R.filter(isAnswerCorrect, answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})
                     </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+            <Grid container spacing={3} justify="center">
+              <Grid item xs={12} sm={8} md={6} lg={5}>
+                <Card style={{ marginBottom: "25px" }}>
+                  <CardContent style={{ paddingTop: "12px", paddingRight: "12px", paddingBottom: "4px", paddingLeft: "4px" }}>
+                    <FlexibleWidthXYPlot height={300}>
+                      <VerticalGridLines />
+                      <HorizontalGridLines />
+                      <XAxis title="Question" tickFormat={x => x >= 0 && Math.round(x) === x ? x : ""} />
+                      <YAxis title="Number of correct answers" tickFormat={x => x >= 0 && Math.round(x) === x ? x : ""} />
+                      <LineSeries data={cumulativeScoreChartData} />
+                    </FlexibleWidthXYPlot>
                   </CardContent>
                 </Card>
               </Grid>
