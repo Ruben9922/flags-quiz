@@ -13,7 +13,7 @@ import * as R from "ramda";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
-import {FlexibleWidthXYPlot, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, XYPlot, YAxis} from "react-vis";
+import {FlexibleWidthXYPlot, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, YAxis} from "react-vis";
 import '../node_modules/react-vis/dist/style.css';
 
 const useStyles = makeStyles(theme => ({
@@ -61,7 +61,7 @@ function SummaryComponent({answers}) {
               <Grid item xs={8} sm={6} md={4} style={{ textAlign: "center" }}>
                 <img
                   src={EmptyStreetSplash}
-                  alt="Empty street splash image"
+                  alt="Empty street splash"
                   style={{ width: "100%" }}
                 />
               </Grid>
