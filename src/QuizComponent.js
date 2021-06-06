@@ -11,6 +11,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
+import {FormControl, FormControlLabel, FormLabel, Radio, RadioGroup} from "@material-ui/core";
 
 function pickCountries(countries) {
   const count = 4; // Technically, count must be less than the number of countries
@@ -95,8 +96,9 @@ function reducer(draft, action) {
 
 function QuizComponent({ countries }) {
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
-  const [view, setView] = React.useState("question");
+  const [view, setView] = React.useState("menu");
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [mode, setMode] = React.useState("endless");
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -109,7 +111,24 @@ function QuizComponent({ countries }) {
   return (
     <>
       <Container maxWidth="lg" style={{marginTop: "6em"}}>
-        {view !== "summary" ? (
+        {view === "menu" && (
+          <div style={{textAlign: "center"}}>
+            <div>
+              <FormControl component="fieldset">
+                <FormLabel component="legend">Game mode</FormLabel>
+                <RadioGroup row aria-label="game mode" name="mode" value={mode} onChange={event => setMode(event.target.value)}>
+                  {/*<FormControlLabel value="classic" control={<Radio />} label="Classic" />*/}
+                  {/*<FormControlLabel value="timed" control={<Radio />} label="Timed" />*/}
+                  <FormControlLabel value="endless" control={<Radio />} label="Endless" />
+                </RadioGroup>
+              </FormControl>
+            </div>
+            <Button variant="contained" color="primary" onClick={() => setView("question")} style={{ marginTop: "20px" }}>
+              Start game
+            </Button>
+          </div>
+        )}
+        {view === "question" && (
           <div style={{textAlign: "center"}}>
             <QuestionComponent
               currentQuestion={state.currentQuestion}
@@ -122,15 +141,22 @@ function QuizComponent({ countries }) {
               End game
             </Button>
           </div>
-        ) : (
+        )}
+        {view === "summary" && (
           <>
             <SummaryComponent answers={state.answers} />
             <div style={{textAlign: "center"}}>
               <Button
                 variant="contained"
-                style={{ marginTop: "25px" }}
+                style={{ marginTop: "25px", marginLeft: "10px" }}
                 onClick={() => { setView("question"); dispatch({ type: "reset", countries }); }}>
                 Play again
+              </Button>
+              <Button
+                variant="contained"
+                style={{ marginTop: "25px", marginLeft: "10px" }}
+                onClick={() => { setView("menu"); dispatch({ type: "reset", countries }); }}>
+                Back to menu
               </Button>
             </div>
           </>
