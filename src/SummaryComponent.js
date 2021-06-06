@@ -46,7 +46,6 @@ function SummaryComponent({answers}) {
     )
   );
 
-  console.log(cumulativeScoreChartData);
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>
