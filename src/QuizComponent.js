@@ -11,7 +11,7 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
-import {FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Tooltip} from "@material-ui/core";
+import {FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip} from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
 
 function pickCountries(countries) {
@@ -138,8 +138,13 @@ function QuizComponent({ countries }) {
     <>
       <Container maxWidth="lg" style={{marginTop: "6em"}}>
         {state.view === "menu" && (
-          <div style={{textAlign: "center"}}>
-            <div>
+          <Grid
+            container
+            direction="column"
+            justify="flex-start"
+            alignItems="center"
+          >
+            <Grid item>
               <FormControl component="fieldset">
                 <FormLabel component="legend">Game mode</FormLabel>
                 <RadioGroup aria-label="game mode" name="mode" value={state.mode} onChange={event => dispatch({ type: "setMode", mode: event.target.value })}>
@@ -164,11 +169,13 @@ function QuizComponent({ countries }) {
                   <FormControlLabel value="endless" control={<Radio />} label="Endless" />
                 </RadioGroup>
               </FormControl>
-            </div>
-            <Button variant="contained" color="primary" onClick={() => dispatch({ type: "startGame" })} style={{ marginTop: "20px" }}>
-              Start game
-            </Button>
-          </div>
+            </Grid>
+            <Grid item>
+              <Button variant="contained" color="primary" onClick={() => dispatch({ type: "startGame" })} style={{ marginTop: "20px" }}>
+                Start game
+              </Button>
+            </Grid>
+          </Grid>
         )}
         {state.view === "question" && (
           <div style={{textAlign: "center"}}>
