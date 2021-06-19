@@ -97,13 +97,6 @@ function reducer(draft, action) {
       draft.answers = [];
       resetQuestion();
 
-      draft.view = "question";
-
-      return;
-    case "goToMenu":
-      draft.answers = [];
-      resetQuestion();
-
       draft.view = "menu";
 
       return;
@@ -165,15 +158,9 @@ function QuizComponent({ countries }) {
             <div style={{textAlign: "center"}}>
               <Button
                 variant="contained"
-                style={{ marginTop: "25px", marginLeft: "10px" }}
+                style={{ marginTop: "25px" }}
                 onClick={() => { dispatch({ type: "playAgain", countries }); }}>
                 Play again
-              </Button>
-              <Button
-                variant="contained"
-                style={{ marginTop: "25px", marginLeft: "10px" }}
-                onClick={() => { dispatch({ type: "goToMenu", countries }); }}>
-                Back to menu
               </Button>
             </div>
           </>
