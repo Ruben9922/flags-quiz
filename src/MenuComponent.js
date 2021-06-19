@@ -2,12 +2,23 @@ import React from "react";
 import {FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip} from "@material-ui/core";
 import HelpIcon from "@material-ui/icons/Help";
 import Button from "@material-ui/core/Button";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+  textWithIcon: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+}));
 
 function MenuComponent({
   mode,
   setMode,
   startGame,
 }) {
+  const classes = useStyles();
+
   return (
     <Grid
       container
@@ -20,11 +31,7 @@ function MenuComponent({
           <FormLabel component="legend">Game mode</FormLabel>
           <RadioGroup aria-label="game mode" name="mode" value={mode} onChange={event => setMode(event.target.value)}>
             <FormControlLabel value="classic" control={<Radio />} label={
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-              }}>
+              <div className={classes.textWithIcon}>
                 Classic
                 &thinsp;
                 <Tooltip
