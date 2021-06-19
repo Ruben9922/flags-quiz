@@ -13,6 +13,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import {FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, Tooltip} from "@material-ui/core";
 import HelpIcon from '@material-ui/icons/Help';
+import MenuComponent from "./MenuComponent";
 
 function pickCountries(countries) {
   const count = 4; // Technically, count must be less than the number of countries
@@ -138,44 +139,11 @@ function QuizComponent({ countries }) {
     <>
       <Container maxWidth="lg" style={{marginTop: "6em"}}>
         {state.view === "menu" && (
-          <Grid
-            container
-            direction="column"
-            justify="flex-start"
-            alignItems="center"
-          >
-            <Grid item>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Game mode</FormLabel>
-                <RadioGroup aria-label="game mode" name="mode" value={state.mode} onChange={event => dispatch({ type: "setMode", mode: event.target.value })}>
-                  <FormControlLabel value="classic" control={<Radio />} label={
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                    }}>
-                      Classic
-                      &thinsp;
-                      <Tooltip
-                        arrow
-                        placement="right"
-                        title="Game continues until an incorrect answer is selected. No time limits."
-                      >
-                        <HelpIcon color="primary" />
-                      </Tooltip>
-                    </div>
-                  } />
-                  {/*<FormControlLabel value="timed" control={<Radio />} label="Timed" />*/}
-                  <FormControlLabel value="endless" control={<Radio />} label="Endless" />
-                </RadioGroup>
-              </FormControl>
-            </Grid>
-            <Grid item>
-              <Button variant="contained" color="primary" onClick={() => dispatch({ type: "startGame" })} style={{ marginTop: "20px" }}>
-                Start game
-              </Button>
-            </Grid>
-          </Grid>
+          <MenuComponent
+            mode={state.mode}
+            setMode={mode => dispatch({ type: "setMode", mode })}
+            startGame={() => dispatch({ type: "startGame" })}
+          />
         )}
         {state.view === "question" && (
           <div style={{textAlign: "center"}}>
