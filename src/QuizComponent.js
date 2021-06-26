@@ -63,7 +63,7 @@ function reducer(draft, action) {
   }
 
   switch (action.type) {
-    case "answer":
+    case "answer": {
       const answer = {
         countries: draft.currentQuestion.countries,
         correctCountry: draft.currentQuestion.correctCountry,
@@ -77,15 +77,19 @@ function reducer(draft, action) {
       // draft.currentQuestion = null;
       draft.answered = true;
 
+      return;
+    }
+    case "resetQuestion": {
+      resetQuestion();
+
+      const isCorrect = isAnswerCorrect(R.last(draft.answers));
+
       if (draft.mode === "classic" && !isCorrect) {
         draft.view = "summary";
       }
 
       return;
-    case "resetQuestion":
-      resetQuestion();
-
-      return;
+    }
     case "closeSnackbar":
       draft.correctSnackbarOpen = false;
       draft.incorrectSnackbarOpen = false;
