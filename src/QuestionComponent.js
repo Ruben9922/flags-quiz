@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import React from "react";
 import * as R from "ramda";
 import {isAnswerCorrect} from "./QuizComponent";
+import TimerComponent from "./TimerComponent";
 
 function QuestionComponent({
   answers,
@@ -12,6 +13,10 @@ function QuestionComponent({
   answered,
   answer,
   resetQuestion,
+  mode,
+  timeLeft,
+  totalTime,
+  onCountdownEnd,
 }) {
   const handleClick = country => {
     answer(country);
@@ -20,6 +25,13 @@ function QuestionComponent({
 
   return (
     <>
+      {mode === "timed" && (
+        <TimerComponent
+          timeLeft={timeLeft}
+          totalTime={totalTime}
+          onCountdownEnd={onCountdownEnd}
+        />
+      )}
       <Typography paragraph>
         Score: {R.length(R.filter(isAnswerCorrect, answers))}/{R.length(answers)}
       </Typography>

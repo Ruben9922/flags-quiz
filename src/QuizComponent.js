@@ -12,6 +12,10 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import MenuComponent from "./MenuComponent";
+import useCountDown from "react-countdown-hook";
+
+const initialTime = 10 * 1000;
+const interval = 1000;
 
 function pickCountries(countries) {
   const count = 4; // Technically, count must be less than the number of countries
@@ -48,7 +52,7 @@ function init(countries) {
 }
 
 export function isAnswerCorrect(answer) {
-  return R.equals(answer.correctCountry, answer.selectedCountry);
+  return answer.selectedCountry !== null && R.equals(answer.correctCountry, answer.selectedCountry);
 }
 
 function reducer(draft, action) {
@@ -60,6 +64,8 @@ function reducer(draft, action) {
       correctCountry: chooseElement(pickedCountries),
     };
     draft.answered = false;
+
+    action.start();
   }
 
   switch (action.type) {
@@ -76,6 +82,8 @@ function reducer(draft, action) {
       draft.incorrectSnackbarOpen = !isCorrect;
       // draft.currentQuestion = null;
       draft.answered = true;
+
+      action.pause();
 
       return;
     }
@@ -96,9 +104,6 @@ function reducer(draft, action) {
 
       return;
     case "playAgain":
-      draft.answers = [];
-      resetQuestion();
-
       draft.view = "menu";
 
       return;
@@ -111,6 +116,8 @@ function reducer(draft, action) {
 
       return;
     case "startGame":
+      draft.answers = [];
+      resetQuestion();
       draft.view = "question";
 
       return;
@@ -121,6 +128,8 @@ function reducer(draft, action) {
 function QuizComponent({ countries }) {
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
   const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  const [timeLeft, { start, pause, resume, reset }] = useCountDown(initialTime, interval);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -137,7 +146,7 @@ function QuizComponent({ countries }) {
           <MenuComponent
             mode={state.mode}
             setMode={mode => dispatch({ type: "setMode", mode })}
-            startGame={() => dispatch({ type: "startGame" })}
+            startGame={() => dispatch({ type: "startGame", start, countries })}
           />
         )}
         {state.view === "question" && (
@@ -145,9 +154,16 @@ function QuizComponent({ countries }) {
             <QuestionComponent
               currentQuestion={state.currentQuestion}
               answers={state.answers}
-              answer={country => dispatch({ type: "answer", country })}
-              resetQuestion={() => dispatch({ type: "resetQuestion", countries })}
+              answer={country => dispatch({ type: "answer", country, pause })}
+              resetQuestion={() => dispatch({ type: "resetQuestion", countries, start })}
               answered={state.answered}
+              mode={state.mode}
+              timeLeft={timeLeft}
+              totalTime={initialTime}
+              onCountdownEnd={() => {
+                dispatch({ type: "answer", country: null, pause: () => {} });
+                setTimeout(() => dispatch({ type: "resetQuestion", countries, start }), 2500);
+              }}
             />
             <Button variant="contained" onClick={() => setDialogOpen(true)} style={{ marginTop: "25px" }}>
               End game
@@ -161,7 +177,7 @@ function QuizComponent({ countries }) {
               <Button
                 variant="contained"
                 style={{ marginTop: "25px" }}
-                onClick={() => { dispatch({ type: "playAgain", countries }); }}>
+                onClick={() => { dispatch({ type: "playAgain" }); }}>
                 Play again
               </Button>
             </div>
@@ -171,7 +187,7 @@ function QuizComponent({ countries }) {
       <Snackbar
         key={R.length(state.answers)}
         open={state.correctSnackbarOpen}
-        autoHideDuration={1000}
+        autoHideDuration={1500}
         onClose={handleSnackbarClose}
       >
         <Alert severity="success" elevation={6} variant="filled">
@@ -181,11 +197,11 @@ function QuizComponent({ countries }) {
       <Snackbar
         key={R.length(state.answers)}
         open={state.incorrectSnackbarOpen}
-        autoHideDuration={1000}
+        autoHideDuration={1500}
         onClose={handleSnackbarClose}
       >
         <Alert severity="error" elevation={6} variant="filled">
-          Incorrect!
+          {R.last(state.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!"}
           {R.last(state.answers)?.correctCountry && (
             <>&nbsp;It's the flag of {R.last(state.answers)?.correctCountry.name}.</>
           )}

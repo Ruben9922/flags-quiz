@@ -43,7 +43,7 @@ function MenuComponent({
                 </Tooltip>
               </div>
             } />
-            {/*<FormControlLabel value="timed" control={<Radio />} label="Timed" />*/}
+            <FormControlLabel value="timed" control={<Radio />} label="Timed" />
             <FormControlLabel value="endless" control={<Radio />} label="Endless" />
           </RadioGroup>
         </FormControl>
