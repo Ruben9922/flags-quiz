@@ -11,7 +11,7 @@ function TimerComponent({
     if (timeLeft === 0) {
       onCountdownEnd();
     }
-  }, [timeLeft]);
+  }, [timeLeft, onCountdownEnd]);
 
   return (
     <Box display="flex" alignItems="center" style={{ marginBottom: "20px" }}>
