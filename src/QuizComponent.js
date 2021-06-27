@@ -136,7 +136,7 @@ function QuizComponent({ countries }) {
       dispatch({ type: "answer", country: null, pause: () => {} });
       setTimeout(() => dispatch({ type: "resetQuestion", countries, start }), 2500);
     },
-    [],
+    [countries, dispatch, start],
   );
 
   const handleSnackbarClose = (event, reason) => {
