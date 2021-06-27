@@ -131,6 +131,14 @@ function QuizComponent({ countries }) {
 
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
 
+  const onCountdownEnd = React.useCallback(
+    () => {
+      dispatch({ type: "answer", country: null, pause: () => {} });
+      setTimeout(() => dispatch({ type: "resetQuestion", countries, start }), 2500);
+    },
+    [],
+  );
+
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -160,10 +168,7 @@ function QuizComponent({ countries }) {
               mode={state.mode}
               timeLeft={timeLeft}
               totalTime={initialTime}
-              onCountdownEnd={() => {
-                dispatch({ type: "answer", country: null, pause: () => {} });
-                setTimeout(() => dispatch({ type: "resetQuestion", countries, start }), 2500);
-              }}
+              onCountdownEnd={onCountdownEnd}
             />
             <Button variant="contained" onClick={() => setDialogOpen(true)} style={{ marginTop: "25px" }}>
               End game
