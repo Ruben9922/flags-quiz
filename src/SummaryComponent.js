@@ -132,7 +132,7 @@ function SummaryComponent({answers}) {
                             <br/>
                             {answer.selectedCountry === null
                               ? "Out of time"
-                              : `${answer.selectedCountry.name} &mdash; selected answer`}
+                              : `${answer.selectedCountry.name} — selected answer`}
                           </p>
                         </Grid>
                       )}
