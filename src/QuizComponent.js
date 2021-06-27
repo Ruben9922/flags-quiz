@@ -129,7 +129,7 @@ function QuizComponent({ countries }) {
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const [timeLeft, { start, pause, resume, reset }] = useCountDown(initialTime, interval);
+  const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
