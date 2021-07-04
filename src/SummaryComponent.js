@@ -5,7 +5,6 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {isAnswerCorrect} from "./QuizComponent";
 import ReactCountryFlag from "react-country-flag";
 import Grid from "@material-ui/core/Grid";
 import emojiSupport from "detect-emoji-support";
@@ -15,6 +14,7 @@ import CardContent from "@material-ui/core/CardContent";
 import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
 import {FlexibleWidthXYPlot, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, YAxis} from "react-vis";
 import '../node_modules/react-vis/dist/style.css';
+import {isAnswerCorrect} from "./utilities";
 
 const useStyles = makeStyles(theme => ({
   root: {

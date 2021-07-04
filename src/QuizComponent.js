@@ -13,6 +13,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import MenuComponent from "./MenuComponent";
 import useCountDown from "react-countdown-hook";
+import {isAnswerCorrect} from "./utilities";
 
 const initialTime = 10 * 1000;
 const interval = 1000;
@@ -49,10 +50,6 @@ function init(countries) {
     view: "menu",
     mode: "classic",
   };
-}
-
-export function isAnswerCorrect(answer) {
-  return answer.selectedCountry !== null && R.equals(answer.correctCountry, answer.selectedCountry);
 }
 
 function reducer(draft, action) {
