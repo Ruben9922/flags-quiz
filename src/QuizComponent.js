@@ -62,7 +62,7 @@ function reducer(draft, action) {
     draft.answered = false;
 
     action.start();
-  }
+  };
 
   switch (action.type) {
     case "answer": {
@@ -72,19 +72,6 @@ function reducer(draft, action) {
         selectedCountry: action.country,
       };
       draft.answers = R.append(answer, draft.answers);
-      if (isAnswerCorrect(answer)) {
-        action.enqueueSnackbar("Correct!", {
-          variant: "success",
-        });
-      } else {
-        let message = R.last(draft.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!";
-        if (R.last(draft.answers)?.correctCountry) {
-          message += ` It's the flag of ${R.last(draft.answers)?.correctCountry.name}.`
-        }
-        action.enqueueSnackbar(message, {
-          variant: "error",
-        });
-      }
       // draft.currentQuestion = null;
       draft.answered = true;
 
@@ -132,6 +119,30 @@ function QuizComponent({ countries }) {
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
+  React.useEffect(() => {
+    if (!R.isEmpty(state.answers)) {
+      if (isAnswerCorrect(R.last(state.answers))) {
+        enqueueSnackbar("Correct!", {
+          variant: "success",
+        });
+      } else {
+        let message = R.last(state.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!";
+        if (R.last(state.answers)?.correctCountry) {
+          message += ` It's the flag of ${R.last(state.answers)?.correctCountry.name}.`
+        }
+        enqueueSnackbar(message, {
+          variant: "error",
+        });
+      }
+    }
+  }, [state.answers, enqueueSnackbar]);
+
+  React.useEffect(() => {
+    if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers))) {
+      setTimeout(() => enqueueSnackbar("Game over", { variant: "default" }), 1500);
+    }
+  }, [state.answers, state.mode, enqueueSnackbar]);
+
   const onCountdownEnd = React.useCallback(
     () => {
       dispatch({ type: "answer", country: null, pause: () => {}, enqueueSnackbar });
@@ -146,6 +157,12 @@ function QuizComponent({ countries }) {
     }
 
     closeSnackbar();
+  };
+
+  const endGame = () => {
+    setDialogOpen(false);
+    dispatch({ type: "endGame", enqueueSnackbar });
+    enqueueSnackbar("Game over", { variant: "default" });
   };
 
   return (
@@ -205,7 +222,11 @@ function QuizComponent({ countries }) {
           <Button onClick={() => setDialogOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => { setDialogOpen(false); dispatch({ type: "endGame" }); }} color="primary" autoFocus>
+          <Button
+            onClick={endGame}
+            color="primary"
+            autoFocus
+          >
             End game
           </Button>
         </DialogActions>
