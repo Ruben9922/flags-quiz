@@ -14,6 +14,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import MenuComponent from "./MenuComponent";
 import useCountDown from "react-countdown-hook";
 import {isAnswerCorrect} from "./utilities";
+import {useSnackbar} from "notistack";
 
 const initialTime = 10 * 1000;
 const interval = 1000;
@@ -44,8 +45,6 @@ function init(countries) {
       correctCountry: chooseElement(pickedCountries),
     },
     answers: [],
-    correctSnackbarOpen: false,
-    incorrectSnackbarOpen: false,
     answered: false,
     view: "menu",
     mode: "classic",
@@ -72,11 +71,20 @@ function reducer(draft, action) {
         correctCountry: draft.currentQuestion.correctCountry,
         selectedCountry: action.country,
       };
-      const isCorrect = isAnswerCorrect(answer);
-
       draft.answers = R.append(answer, draft.answers);
-      draft.correctSnackbarOpen = isCorrect;
-      draft.incorrectSnackbarOpen = !isCorrect;
+      if (isAnswerCorrect(answer)) {
+        action.enqueueSnackbar("Correct!", {
+          variant: "success",
+        });
+      } else {
+        let message = R.last(draft.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!";
+        if (R.last(draft.answers)?.correctCountry) {
+          message += ` It's the flag of ${R.last(draft.answers)?.correctCountry.name}.`
+        }
+        action.enqueueSnackbar(message, {
+          variant: "error",
+        });
+      }
       // draft.currentQuestion = null;
       draft.answered = true;
 
@@ -95,11 +103,6 @@ function reducer(draft, action) {
 
       return;
     }
-    case "closeSnackbar":
-      draft.correctSnackbarOpen = false;
-      draft.incorrectSnackbarOpen = false;
-
-      return;
     case "playAgain":
       draft.view = "menu";
 
@@ -127,13 +130,14 @@ function QuizComponent({ countries }) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   const onCountdownEnd = React.useCallback(
     () => {
-      dispatch({ type: "answer", country: null, pause: () => {} });
+      dispatch({ type: "answer", country: null, pause: () => {}, enqueueSnackbar });
       setTimeout(() => dispatch({ type: "resetQuestion", countries, start }), 2500);
     },
-    [countries, dispatch, start],
+    [countries, dispatch, start, enqueueSnackbar],
   );
 
   const handleSnackbarClose = (event, reason) => {
@@ -141,7 +145,7 @@ function QuizComponent({ countries }) {
       return;
     }
 
-    dispatch({ type: "closeSnackbar" });
+    closeSnackbar();
   };
 
   return (
@@ -159,7 +163,7 @@ function QuizComponent({ countries }) {
             <QuestionComponent
               currentQuestion={state.currentQuestion}
               answers={state.answers}
-              answer={country => dispatch({ type: "answer", country, pause })}
+              answer={country => dispatch({ type: "answer", country, pause, enqueueSnackbar })}
               resetQuestion={() => dispatch({ type: "resetQuestion", countries, start })}
               answered={state.answered}
               mode={state.mode}
@@ -186,29 +190,6 @@ function QuizComponent({ countries }) {
           </>
         )}
       </Container>
-      <Snackbar
-        key={R.length(state.answers)}
-        open={state.correctSnackbarOpen}
-        autoHideDuration={1500}
-        onClose={handleSnackbarClose}
-      >
-        <Alert severity="success" elevation={6} variant="filled">
-          Correct!
-        </Alert>
-      </Snackbar>
-      <Snackbar
-        key={R.length(state.answers)}
-        open={state.incorrectSnackbarOpen}
-        autoHideDuration={1500}
-        onClose={handleSnackbarClose}
-      >
-        <Alert severity="error" elevation={6} variant="filled">
-          {R.last(state.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!"}
-          {R.last(state.answers)?.correctCountry && (
-            <>&nbsp;It's the flag of {R.last(state.answers)?.correctCountry.name}.</>
-          )}
-        </Alert>
-      </Snackbar>
       <Dialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

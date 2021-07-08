@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Backdrop from "@material-ui/core/Backdrop";
 import Container from "@material-ui/core/Container";
 import { useFetch } from "use-http";
+import {SnackbarProvider} from "notistack";
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
@@ -22,7 +23,11 @@ function App() {
   const { loading, error, data = null } = useFetch("https://restcountries.eu/rest/v2/all?fields=name;alpha2Code", {}, []);
 
   return (
-    <>
+    <SnackbarProvider
+      maxSnack={3}
+      anchorOrigin={{ horizontal: "right", vertical: "top" }}
+      autoHideDuration={1500}
+    >
       <AppBarComponent />
       {error && (
         <Container maxWidth="md" style={{marginTop: "5em"}}>
@@ -38,7 +43,7 @@ function App() {
         </Backdrop>
       )}
       {data && <QuizComponent countries={data} />}
-    </>
+    </SnackbarProvider>
   );
 }
 
