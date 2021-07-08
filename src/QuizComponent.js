@@ -134,6 +134,12 @@ function QuizComponent({ countries }) {
           variant: "error",
         });
       }
+
+      // Snackbar for consecutive correct answers
+      const streak = R.length(R.takeLastWhile(isAnswerCorrect, state.answers));
+      if (streak > 1 && (R.includes(streak, [3]) || streak % 5 === 0)) {
+        setTimeout(() => enqueueSnackbar(`Nice! ${streak} in a row!`), 500);
+      }
     }
   }, [state.answers, enqueueSnackbar]);
 
