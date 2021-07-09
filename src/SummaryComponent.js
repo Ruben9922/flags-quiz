@@ -46,6 +46,12 @@ function SummaryComponent({answers}) {
     )
   );
 
+  const maxStreak = R.reduce(([maxStreak, currentStreak], value) => {
+    const newCurrentStreak = isAnswerCorrect(value) ? currentStreak + 1 : 0;
+    const newMaxStreak = R.max(maxStreak, newCurrentStreak);
+    return [newMaxStreak, newCurrentStreak];
+  }, [0, 0], answers)[0];
+
   return (
     <>
       <Typography variant="h5" component="h1" gutterBottom>
@@ -69,8 +75,8 @@ function SummaryComponent({answers}) {
         ) : (
           <>
             <Grid container spacing={3} justify="center">
-              <Grid item xs={6} sm={5} md={4} lg={3}>
-                <Card style={{ textAlign: "center", marginBottom: "25px" }}>
+              <Grid item xs={6} sm={5} md={4} lg={3} style={{ marginBottom: "25px" }}>
+                <Card style={{ textAlign: "center" }}>
                   <CardContent>
                     <Typography color="textSecondary" gutterBottom>
                       Score
@@ -81,7 +87,19 @@ function SummaryComponent({answers}) {
                   </CardContent>
                 </Card>
               </Grid>
-            </Grid>
+              <Grid item xs={6} sm={5} md={4} lg={3} style={{ marginBottom: "25px" }}>
+                <Card style={{ textAlign: "center" }}>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Longest streak
+                    </Typography>
+                    <Typography variant="h5" component="h2">
+                      {maxStreak}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              </Grid>
             <Grid container spacing={3} justify="center">
               <Grid item xs={12} sm={8} md={6} lg={5}>
                 <Card style={{ marginBottom: "25px" }}>
