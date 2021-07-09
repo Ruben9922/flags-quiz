@@ -9,6 +9,7 @@ import Backdrop from "@material-ui/core/Backdrop";
 import Container from "@material-ui/core/Container";
 import { useFetch } from "use-http";
 import {SnackbarProvider} from "notistack";
+import {Grow} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   backdrop: {
@@ -27,6 +28,7 @@ function App() {
       maxSnack={3}
       anchorOrigin={{ horizontal: "right", vertical: "top" }}
       autoHideDuration={1500}
+      TransitionComponent={Grow}
     >
       <AppBarComponent />
       {error && (
