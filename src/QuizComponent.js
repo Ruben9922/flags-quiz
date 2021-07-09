@@ -115,7 +115,7 @@ function QuizComponent({ countries }) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   React.useEffect(() => {
     if (!R.isEmpty(state.answers)) {
