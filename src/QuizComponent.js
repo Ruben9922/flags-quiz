@@ -151,7 +151,7 @@ function QuizComponent({ countries }) {
 
   React.useEffect(() => {
     if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers))) {
-      setTimeout(() => enqueueSnackbar("Game over", { variant: "default" }), 1500);
+      setTimeout(() => enqueueSnackbar("Game over!", { variant: "default" }), 1500);
     }
   }, [state.answers, state.mode, enqueueSnackbar]);
 
@@ -174,7 +174,7 @@ function QuizComponent({ countries }) {
   const endGame = () => {
     setDialogOpen(false);
     dispatch({ type: "endGame", enqueueSnackbar });
-    enqueueSnackbar("Game over", { variant: "default" });
+    enqueueSnackbar("Game over!", { variant: "default" });
   };
 
   return (
