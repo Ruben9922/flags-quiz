@@ -1,7 +1,5 @@
 import React from 'react';
 import Container from "@material-ui/core/Container";
-import Snackbar from "@material-ui/core/Snackbar";
-import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
 import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
@@ -169,14 +167,6 @@ function QuizComponent({ countries }) {
     },
     [countries, dispatch, start, enqueueSnackbar],
   );
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    closeSnackbar();
-  };
 
   const endGame = () => {
     setDialogOpen(false);
