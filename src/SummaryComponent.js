@@ -46,11 +46,18 @@ function SummaryComponent({answers}) {
     )
   );
 
-  const maxStreak = R.reduce(([maxStreak, currentStreak], value) => {
+  const maxStreak = R.reduce(({ maxStreak, currentStreak }, value) => {
     const newCurrentStreak = isAnswerCorrect(value) ? currentStreak + 1 : 0;
     const newMaxStreak = R.max(maxStreak, newCurrentStreak);
-    return [newMaxStreak, newCurrentStreak];
-  }, [0, 0], answers)[0];
+
+    return {
+      maxStreak: newMaxStreak,
+      currentStreak: newCurrentStreak,
+    };
+  }, {
+    maxStreak: 0,
+    currentStreak: 0,
+  }, answers).maxStreak;
 
   return (
     <>
