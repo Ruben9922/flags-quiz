@@ -149,11 +149,18 @@ function QuizComponent({ countries }) {
     }
   }, [state.answers, enqueueSnackbar]);
 
+  const displayAllCorrectSnackbar = React.useCallback(() => {
+    if (R.length(state.answers) >= 3 && R.all(isAnswerCorrect, state.answers)) {
+      enqueueSnackbar("\u{1F389} Awesome! You got 100%!", { variant: "default" });
+    }
+  }, [state.answers, enqueueSnackbar]);
+
   React.useEffect(() => {
     if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers))) {
       setTimeout(() => enqueueSnackbar("Game over!", { variant: "default" }), 1500);
+      setTimeout(displayAllCorrectSnackbar, 2000);
     }
-  }, [state.answers, state.mode, enqueueSnackbar]);
+  }, [state.answers, state.mode, enqueueSnackbar, displayAllCorrectSnackbar]);
 
   const onCountdownEnd = React.useCallback(
     () => {
@@ -175,6 +182,7 @@ function QuizComponent({ countries }) {
     setDialogOpen(false);
     dispatch({ type: "endGame", enqueueSnackbar });
     enqueueSnackbar("Game over!", { variant: "default" });
+    setTimeout(displayAllCorrectSnackbar, 500);
   };
 
   return (
