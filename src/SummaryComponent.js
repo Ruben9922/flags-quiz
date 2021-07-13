@@ -14,7 +14,8 @@ import CardContent from "@material-ui/core/CardContent";
 import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
 import {FlexibleWidthXYPlot, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, YAxis} from "react-vis";
 import '../node_modules/react-vis/dist/style.css';
-import {isAnswerCorrect} from "./utilities";
+import {customHumanizer, isAnswerCorrect} from "./utilities";
+import TimerIcon from '@material-ui/icons/Timer';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -28,6 +29,11 @@ const useStyles = makeStyles(theme => ({
   secondaryHeading: {
     fontSize: theme.typography.pxToRem(15),
     color: theme.palette.text.secondary,
+  },
+  textWithIcon: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
   },
 }));
 
@@ -144,23 +150,32 @@ function SummaryComponent({answers}) {
                           }}
                         />
                       </Grid>
-                      {isAnswerCorrect(answer) ? (
-                        <Grid item md>
-                          <p>
-                            {answer.correctCountry.name}
-                          </p>
-                        </Grid>
-                      ) : (
-                        <Grid item md>
-                          <p>
-                            {answer.correctCountry.name} &mdash; correct answer
-                            <br/>
-                            {answer.selectedCountry === null
-                              ? "Out of time"
-                              : `${answer.selectedCountry.name} — selected answer`}
-                          </p>
-                        </Grid>
-                      )}
+                      <Grid item md>
+                        <p>
+                          {isAnswerCorrect(answer) ? (
+                            <>
+                                {answer.correctCountry.name}
+                            </>
+                          ) : (
+                            <>
+                                {answer.correctCountry.name} &mdash; correct answer
+                                <br/>
+                                {answer.selectedCountry === null
+                                  ? "Out of time"
+                                  : `${answer.selectedCountry.name} — selected answer`}
+                            </>
+                          )}
+                        </p>
+                      </Grid>
+                      <Grid item md={2}>
+                        <p>
+                          <div className={classes.textWithIcon}>
+                            <TimerIcon/>
+                            &thinsp;
+                            {answer.timeTaken === null ? "—" : customHumanizer(answer.timeTaken)}
+                          </div>
+                        </p>
+                      </Grid>
                     </Grid>
                   </AccordionDetails>
                 </Accordion>

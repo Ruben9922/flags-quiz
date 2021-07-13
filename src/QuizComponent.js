@@ -46,6 +46,7 @@ function init(countries) {
     answered: false,
     view: "menu",
     mode: "classic",
+    timestamp: null,
   };
 }
 
@@ -56,10 +57,13 @@ function reducer(draft, action) {
         countries: draft.currentQuestion.countries,
         correctCountry: draft.currentQuestion.correctCountry,
         selectedCountry: action.country,
+        timeTaken: action.country === null ? null : (performance.now() - draft.timestamp),
       };
       draft.answers = R.append(answer, draft.answers);
+
       // draft.currentQuestion = null;
       draft.answered = true;
+      draft.timestamp = null;
 
       return;
     }
@@ -71,6 +75,7 @@ function reducer(draft, action) {
         correctCountry: chooseElement(pickedCountries),
       };
       draft.answered = false;
+      draft.timestamp = performance.now();
 
       if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers))) {
         draft.view = "summary";
