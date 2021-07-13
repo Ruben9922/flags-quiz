@@ -50,18 +50,6 @@ function init(countries) {
 }
 
 function reducer(draft, action) {
-  const resetQuestion = () => {
-    const pickedCountries = pickCountries(action.countries);
-
-    draft.currentQuestion = {
-      countries: pickedCountries,
-      correctCountry: chooseElement(pickedCountries),
-    };
-    draft.answered = false;
-
-    action.start();
-  };
-
   switch (action.type) {
     case "answer": {
       const answer = {
@@ -73,16 +61,18 @@ function reducer(draft, action) {
       // draft.currentQuestion = null;
       draft.answered = true;
 
-      action.pause();
-
       return;
     }
     case "resetQuestion": {
-      resetQuestion();
+      const pickedCountries = pickCountries(action.countries);
 
-      const isCorrect = isAnswerCorrect(R.last(draft.answers));
+      draft.currentQuestion = {
+        countries: pickedCountries,
+        correctCountry: chooseElement(pickedCountries),
+      };
+      draft.answered = false;
 
-      if (draft.mode === "classic" && !isCorrect) {
+      if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers))) {
         draft.view = "summary";
       }
 
@@ -102,7 +92,6 @@ function reducer(draft, action) {
       return;
     case "startGame":
       draft.answers = [];
-      resetQuestion();
       draft.view = "question";
 
       return;
@@ -160,13 +149,28 @@ function QuizComponent({ countries }) {
     }
   }, [state.answers, state.mode, enqueueSnackbar, displayAllCorrectSnackbar]);
 
+  const startGame = () => {
+    dispatch({ type: "startGame", countries });
+    resetQuestion();
+  };
+
+  const resetQuestion = React.useCallback(() => {
+    dispatch({ type: "resetQuestion", countries });
+    start();
+  }, [countries, dispatch, start]);
+
   const onCountdownEnd = React.useCallback(
     () => {
-      dispatch({ type: "answer", country: null, pause: () => {}, enqueueSnackbar });
-      setTimeout(() => dispatch({ type: "resetQuestion", countries, start }), 2500);
+      dispatch({ type: "answer", country: null });
+      setTimeout(resetQuestion, 2500);
     },
-    [countries, dispatch, start, enqueueSnackbar],
+    [dispatch, resetQuestion],
   );
+
+  const answer = country => {
+    dispatch({ type: "answer", country });
+    pause();
+  };
 
   const endGame = () => {
     setDialogOpen(false);
@@ -182,7 +186,7 @@ function QuizComponent({ countries }) {
           <MenuComponent
             mode={state.mode}
             setMode={mode => dispatch({ type: "setMode", mode })}
-            startGame={() => dispatch({ type: "startGame", start, countries })}
+            startGame={startGame}
           />
         )}
         {state.view === "question" && (
@@ -190,8 +194,8 @@ function QuizComponent({ countries }) {
             <QuestionComponent
               currentQuestion={state.currentQuestion}
               answers={state.answers}
-              answer={country => dispatch({ type: "answer", country, pause, enqueueSnackbar })}
-              resetQuestion={() => dispatch({ type: "resetQuestion", countries, start })}
+              answer={answer}
+              resetQuestion={resetQuestion}
               answered={state.answered}
               mode={state.mode}
               timeLeft={timeLeft}
