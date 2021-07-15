@@ -12,7 +12,15 @@ import * as R from "ramda";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
-import {FlexibleWidthXYPlot, HorizontalGridLines, LineSeries, VerticalGridLines, XAxis, YAxis} from "react-vis";
+import {
+  FlexibleWidthXYPlot,
+  HorizontalGridLines,
+  LineMarkSeries,
+  LineSeries,
+  VerticalGridLines,
+  XAxis,
+  YAxis
+} from "react-vis";
 import '../node_modules/react-vis/dist/style.css';
 import {customHumanizer, isAnswerCorrect} from "./utilities";
 import TimerIcon from '@material-ui/icons/Timer';
@@ -50,6 +58,15 @@ function SummaryComponent({answers}) {
       [0],
       answers
     )
+  );
+
+  const timeTakenChartData = R.addIndex(R.map)(
+    (answer, index) => ({
+      x: index + 1,
+      y: answer.timeTaken === null ? null : (answer.timeTaken / 1000),
+      color: isAnswerCorrect(answer),
+    }),
+    answers
   );
 
   const maxStreak = R.reduce(({ maxStreak, currentStreak }, value) => {
@@ -123,6 +140,24 @@ function SummaryComponent({answers}) {
                       <XAxis title="Question" tickFormat={x => x >= 0 && Math.round(x) === x ? x : ""} />
                       <YAxis title="Number of correct answers" tickFormat={x => x >= 0 && Math.round(x) === x ? x : ""} />
                       <LineSeries data={cumulativeScoreChartData} />
+                    </FlexibleWidthXYPlot>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} sm={8} md={6} lg={5}>
+                <Card style={{ marginBottom: "25px" }}>
+                  <CardContent style={{ paddingTop: "12px", paddingRight: "12px", paddingBottom: "4px", paddingLeft: "4px" }}>
+                    <FlexibleWidthXYPlot
+                      height={300}
+                      colorType="category"
+                      colorDomain={[true, false]}
+                      colorRange={["green", "red"]}
+                    >
+                      <VerticalGridLines />
+                      <HorizontalGridLines />
+                      <XAxis title="Question #" tickFormat={x => x >= 1 && Math.round(x) === x ? x : ""} />
+                      <YAxis title="Time taken (s)" />
+                      <LineMarkSeries data={timeTakenChartData} getNull={v => v.y !== null} />
                     </FlexibleWidthXYPlot>
                   </CardContent>
                 </Card>
