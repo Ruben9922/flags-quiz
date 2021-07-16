@@ -22,7 +22,7 @@ import {
   YAxis
 } from "react-vis";
 import '../node_modules/react-vis/dist/style.css';
-import {customHumanizer, isAnswerCorrect} from "./utilities";
+import {customHumanizer, formatInteger, formatIntegerWithSign, isAnswerCorrect} from "./utilities";
 import TimerIcon from '@material-ui/icons/Timer';
 import {computeTotalBaseScore, computeTotalStreakScore, computeStreaks} from "./scoring";
 

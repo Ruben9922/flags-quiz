@@ -26,3 +26,12 @@ export const customHumanizer = humanizeDuration.humanizer({
   },
 });
 
+export const formatInteger = x => x.toLocaleString(undefined, {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+export const formatIntegerWithSign = x => x.toLocaleString(undefined, {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+  signDisplay: "always",
+});
