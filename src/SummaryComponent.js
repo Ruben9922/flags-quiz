@@ -125,7 +125,7 @@ function SummaryComponent({answers}) {
                           </td>
                           <td style={{ textAlign: "right" }} color="textSecondary">
                             <Typography color="textSecondary">
-                              {formatIntegerWithSign(totalBaseScore)}
+                              {formatInteger(totalBaseScore)}
                             </Typography>
                           </td>
                         </tr>
