@@ -24,6 +24,7 @@ import {
 import '../node_modules/react-vis/dist/style.css';
 import {customHumanizer, isAnswerCorrect} from "./utilities";
 import TimerIcon from '@material-ui/icons/Timer';
+import {computeTotalBaseScore, computeTotalStreakScore, computeStreaks} from "./scoring";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -70,39 +71,17 @@ function SummaryComponent({answers}) {
   );
 
   const correctAnswersTimeTaken = R.map(answer => answer.timeTaken, R.filter(answer => isAnswerCorrect(answer), answers));
-  const streaks = R.reduce((acc, value) =>
-      isAnswerCorrect(value)
-        ? R.append(R.last(acc) + 1, R.init(acc)) // Add 1 to the last streak already in the array
-        : R.append(0, acc) // Create a new streak initialised to 0
-    , [0], answers);
+  const streaks = computeStreaks(answers);
 
   // Calculate score
   // Base score is a score for answering a question, based on the time taken
-  const baseScore = R.sum(R.map(t => 1000000 / t, correctAnswersTimeTaken));
-  const scorePerStreak = 1000;
-  const streakScore = scorePerStreak * R.sum(R.map(streak => {
-    let thresholdsExceeded = 0;
-    const thresholds = [3];
-    thresholdsExceeded += R.length(R.filter(streakThreshold => streak >= streakThreshold, thresholds));
-    const divisor = 5;
-    thresholdsExceeded += Math.floor(streak / divisor);
-    return thresholdsExceeded;
-  }, streaks));
-  const score = baseScore + streakScore;
+  const totalBaseScore = computeTotalBaseScore(correctAnswersTimeTaken);
+  const totalStreakScore = computeTotalStreakScore(streaks);
+  const totalScore = totalBaseScore + totalStreakScore;
 
   const maxStreak = R.apply(Math.max, streaks);
   const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
   const averageTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.mean(correctAnswersTimeTaken);
-
-  const formatInteger = x => x.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-  const formatIntegerWithSign = x => x.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-    signDisplay: "always",
-  });
 
   return (
     <>
@@ -134,7 +113,7 @@ function SummaryComponent({answers}) {
                       Score
                     </Typography>
                     <Typography variant="h4" component="h2" gutterBottom>
-                      {formatInteger(score)}
+                      {formatInteger(totalScore)}
                     </Typography>
                     <table style={{ maxWidth: "100%", minWidth: "250px", marginLeft: "auto", marginRight: "auto" , paddingLeft: "10px", paddingRight: "10px" }}>
                       <tbody>
@@ -146,7 +125,7 @@ function SummaryComponent({answers}) {
                           </td>
                           <td style={{ textAlign: "right" }} color="textSecondary">
                             <Typography color="textSecondary">
-                              {formatIntegerWithSign(baseScore)}
+                              {formatIntegerWithSign(totalBaseScore)}
                             </Typography>
                           </td>
                         </tr>
@@ -158,7 +137,7 @@ function SummaryComponent({answers}) {
                           </td>
                           <td style={{ textAlign: "right" }} color="textSecondary">
                             <Typography color="textSecondary">
-                              {formatIntegerWithSign(streakScore)}
+                              {formatIntegerWithSign(totalStreakScore)}
                             </Typography>
                           </td>
                         </tr>

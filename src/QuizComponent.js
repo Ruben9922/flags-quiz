@@ -13,6 +13,7 @@ import MenuComponent from "./MenuComponent";
 import useCountDown from "react-countdown-hook";
 import {isAnswerCorrect} from "./utilities";
 import {useSnackbar} from "notistack";
+import {computeStreak, isStreakAtThreshold} from "./scoring";
 
 const initialTime = 10 * 1000;
 const interval = 1000;
@@ -119,8 +120,8 @@ function QuizComponent({ countries }) {
         });
 
         // Snackbar for consecutive correct answers
-        const streak = R.length(R.takeLastWhile(isAnswerCorrect, state.answers));
-        if (streak > 1 && (R.includes(streak, [3]) || streak % 5 === 0)) {
+        const streak = computeStreak(state.answers);
+        if (isStreakAtThreshold(streak)) {
           setTimeout(() => enqueueSnackbar(`\u{1F389} Nice! ${streak} in a row!`), 500);
         }
       } else {
@@ -133,7 +134,7 @@ function QuizComponent({ countries }) {
         });
 
         // Snackbar for losing a streak
-        const prevStreak = R.length(R.takeLastWhile(isAnswerCorrect, R.init(state.answers)));
+        const prevStreak = computeStreak(R.init(state.answers));
         if (prevStreak >= 3) {
           setTimeout(() => enqueueSnackbar(`\u{1F622} Awh! You just lost your streak of ${prevStreak}!`), 500);
         }
