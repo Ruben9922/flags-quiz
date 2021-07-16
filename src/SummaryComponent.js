@@ -69,18 +69,40 @@ function SummaryComponent({answers}) {
     answers
   );
 
-  const maxStreak = R.reduce(({ maxStreak, currentStreak }, value) => {
-    const newCurrentStreak = isAnswerCorrect(value) ? currentStreak + 1 : 0;
-    const newMaxStreak = R.max(maxStreak, newCurrentStreak);
+  const correctAnswersTimeTaken = R.map(answer => answer.timeTaken, R.filter(answer => isAnswerCorrect(answer), answers));
+  const streaks = R.reduce((acc, value) =>
+      isAnswerCorrect(value)
+        ? R.append(R.last(acc) + 1, R.init(acc)) // Add 1 to the last streak already in the array
+        : R.append(0, acc) // Create a new streak initialised to 0
+    , [0], answers);
 
-    return {
-      maxStreak: newMaxStreak,
-      currentStreak: newCurrentStreak,
-    };
-  }, {
-    maxStreak: 0,
-    currentStreak: 0,
-  }, answers).maxStreak;
+  // Calculate score
+  // Base score is a score for answering a question, based on the time taken
+  const baseScore = R.sum(R.map(t => 1000000 / t, correctAnswersTimeTaken));
+  const scorePerStreak = 1000;
+  const streakScore = scorePerStreak * R.sum(R.map(streak => {
+    let thresholdsExceeded = 0;
+    const thresholds = [3];
+    thresholdsExceeded += R.length(R.filter(streakThreshold => streak >= streakThreshold, thresholds));
+    const divisor = 5;
+    thresholdsExceeded += Math.floor(streak / divisor);
+    return thresholdsExceeded;
+  }, streaks));
+  const score = baseScore + streakScore;
+
+  const maxStreak = R.apply(Math.max, streaks);
+  const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
+  const averageTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.mean(correctAnswersTimeTaken);
+
+  const formatInteger = x => x.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+  const formatIntegerWithSign = x => x.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    signDisplay: "always",
+  });
 
   return (
     <>
@@ -104,12 +126,54 @@ function SummaryComponent({answers}) {
           </>
         ) : (
           <>
-            <Grid container spacing={3} justify="center">
-              <Grid item xs={6} sm={5} md={4} lg={3} style={{ marginBottom: "25px" }}>
+            <Grid container spacing={3} justify="center" style={{ marginBottom: "25px" }}>
+              <Grid item>
                 <Card style={{ textAlign: "center" }}>
                   <CardContent>
                     <Typography color="textSecondary" gutterBottom>
                       Score
+                    </Typography>
+                    <Typography variant="h4" component="h2" gutterBottom>
+                      {formatInteger(score)}
+                    </Typography>
+                    <table style={{ maxWidth: "100%", minWidth: "250px", marginLeft: "auto", marginRight: "auto" , paddingLeft: "10px", paddingRight: "10px" }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ textAlign: "left" }} color="textSecondary">
+                            <Typography color="textSecondary">
+                              Base score
+                            </Typography>
+                          </td>
+                          <td style={{ textAlign: "right" }} color="textSecondary">
+                            <Typography color="textSecondary">
+                              {formatIntegerWithSign(baseScore)}
+                            </Typography>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ textAlign: "left" }} color="textSecondary">
+                            <Typography color="textSecondary">
+                              Streak bonus
+                            </Typography>
+                          </td>
+                          <td style={{ textAlign: "right" }} color="textSecondary">
+                            <Typography color="textSecondary">
+                              {formatIntegerWithSign(streakScore)}
+                            </Typography>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+            <Grid container spacing={3} justify="center" style={{ marginBottom: "25px" }}>
+              <Grid item xs={6} sm={5} md={4} lg={3}>
+                <Card style={{ textAlign: "center" }}>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Correct answers
                     </Typography>
                     <Typography variant="h5" component="h2">
                       {R.length(R.filter(isAnswerCorrect, answers))}/{R.length(answers)} ({(R.length(R.filter(isAnswerCorrect, answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})
@@ -117,7 +181,7 @@ function SummaryComponent({answers}) {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={6} sm={5} md={4} lg={3} style={{ marginBottom: "25px" }}>
+              <Grid item xs={6} sm={5} md={4} lg={3}>
                 <Card style={{ textAlign: "center" }}>
                   <CardContent>
                     <Typography color="textSecondary" gutterBottom>
@@ -129,7 +193,34 @@ function SummaryComponent({answers}) {
                   </CardContent>
                 </Card>
               </Grid>
+              <Grid item xs={6} sm={5} md={4} lg={3}>
+                <Card style={{ textAlign: "center" }}>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Fastest correct answer
+                    </Typography>
+                    <Typography variant="h5" component="h2">
+                      {minTimeTaken === null ? "—" : customHumanizer(minTimeTaken)}
+                    </Typography>
+                  </CardContent>
+                </Card>
               </Grid>
+              <Grid item xs={6} sm={5} md={4} lg={3}>
+                <Card style={{ textAlign: "center" }}>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Average time per correct answer
+                    </Typography>
+                    <Typography variant="h5" component="h2">
+                      {averageTimeTaken === null ? "—" : customHumanizer(averageTimeTaken)}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+            {/*<Typography variant="caption">*/}
+            {/*  Note that only correct answers are included in the times shown.*/}
+            {/*</Typography>*/}
             <Grid container spacing={3} justify="center">
               <Grid item xs={12} sm={8} md={6} lg={5}>
                 <Card style={{ marginBottom: "25px" }}>
