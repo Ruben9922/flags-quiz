@@ -24,7 +24,12 @@ import {
 import '../node_modules/react-vis/dist/style.css';
 import {customHumanizer, formatInteger, formatIntegerWithSign, isAnswerCorrect} from "./utilities";
 import TimerIcon from '@material-ui/icons/Timer';
-import {computeTotalBaseScore, computeTotalStreakScore, computeStreaks} from "./scoring";
+import {
+  computeTotalBaseScore,
+  computeTotalStreakScore,
+  computeStreaks,
+  computeAllCorrectAchievementBonus
+} from "./scoring";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -77,7 +82,8 @@ function SummaryComponent({answers}) {
   // Base score is a score for answering a question, based on the time taken
   const totalBaseScore = computeTotalBaseScore(correctAnswersTimeTaken);
   const totalStreakScore = computeTotalStreakScore(streaks);
-  const totalScore = totalBaseScore + totalStreakScore;
+  const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers);
+  const totalScore = totalBaseScore + totalStreakScore + allCorrectAchievementBonus;
 
   const maxStreak = R.apply(Math.max, streaks);
   const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
@@ -141,6 +147,20 @@ function SummaryComponent({answers}) {
                             </Typography>
                           </td>
                         </tr>
+                        {allCorrectAchievementBonus > 0 && (
+                          <tr>
+                            <td style={{ textAlign: "left" }} color="textSecondary">
+                              <Typography color="textSecondary">
+                                100% correct bonus
+                              </Typography>
+                            </td>
+                            <td style={{ textAlign: "right" }} color="textSecondary">
+                              <Typography color="textSecondary">
+                                {formatIntegerWithSign(allCorrectAchievementBonus)}
+                              </Typography>
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </CardContent>

@@ -13,7 +13,7 @@ import MenuComponent from "./MenuComponent";
 import useCountDown from "react-countdown-hook";
 import {isAnswerCorrect} from "./utilities";
 import {useSnackbar} from "notistack";
-import {computeStreak, isStreakAtThreshold} from "./scoring";
+import {computeStreak, isAllCorrectAchievement, isStreakAtThreshold} from "./scoring";
 
 const initialTime = 10 * 1000;
 const interval = 1000;
@@ -143,7 +143,7 @@ function QuizComponent({ countries }) {
   }, [state.answers, enqueueSnackbar]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
-    if (R.length(state.answers) >= 3 && R.all(isAnswerCorrect, state.answers)) {
+    if (isAllCorrectAchievement(state.answers)) {
       enqueueSnackbar("\u{1F389} Awesome! You got 100%!", { variant: "default" });
     }
   }, [state.answers, enqueueSnackbar]);

@@ -3,6 +3,7 @@ import {isAnswerCorrect} from "./utilities";
 
 // Constants and functions used in score and streak calculations
 export const scorePerStreak = 1000;
+export const allCorrectAchievementScore = 500;
 export const streakThresholds = [3];
 export const streakModulus = 5;
 
@@ -40,4 +41,12 @@ export function computeStreakScore(streak) {
 
 export function computeTotalStreakScore(streaks) {
   return R.sum(R.map(computeStreakScore, streaks));
+}
+
+export function isAllCorrectAchievement(answers) {
+  return R.length(answers) >= 3 && R.all(isAnswerCorrect, answers);
+}
+
+export function computeAllCorrectAchievementBonus(answers) {
+  return isAllCorrectAchievement(answers) ? allCorrectAchievementScore * R.length(answers) : 0;
 }
