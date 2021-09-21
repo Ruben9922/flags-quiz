@@ -1,3 +1,3 @@
 # Flags Quiz
 
-[![Build Status](https://travis-ci.com/Ruben9922/flags-quiz.svg?branch=master)](https://travis-ci.com/Ruben9922/flags-quiz)
+![Build Status](https://github.com/Ruben9922/flags-quiz/actions/workflows/build-deploy.yml/badge.svg)
