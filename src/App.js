@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 function App() {
   const classes = useStyles();
 
-  const { loading, error, data = null } = useFetch("https://restcountries.eu/rest/v2/all?fields=name;alpha2Code", {}, []);
+  const { loading, error, data = null } = useFetch("https://restcountries.com/v2/all?fields=name,alpha2Code", {}, []);
 
   return (
     <SnackbarProvider
