@@ -1,6 +1,6 @@
 import React from 'react';
-import AppBarComponent from "./AppBarComponent";
-import QuizComponent from "./QuizComponent";
+import AppBar from "./AppBar";
+import Quiz from "./Quiz";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
@@ -30,7 +30,7 @@ function App() {
       autoHideDuration={1500}
       TransitionComponent={Grow}
     >
-      <AppBarComponent />
+      <AppBar />
       {error && (
         <Container maxWidth="md" style={{marginTop: "5em"}}>
           <Alert severity="error" elevation={6} variant="filled">
@@ -44,7 +44,7 @@ function App() {
           <CircularProgress color="inherit" />
         </Backdrop>
       )}
-      {data && <QuizComponent countries={data} />}
+      {data && <Quiz countries={data} />}
     </SnackbarProvider>
   );
 }

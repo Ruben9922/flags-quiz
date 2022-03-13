@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function SummaryComponent({answers}) {
+function Summary({answers}) {
   const classes = useStyles();
 
   const cumulativeScoreChartData = R.addIndex(R.map)(
@@ -312,4 +312,4 @@ function SummaryComponent({answers}) {
   );
 }
 
-export default SummaryComponent;
+export default Summary;

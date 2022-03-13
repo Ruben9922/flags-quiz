@@ -3,13 +3,13 @@ import Container from "@material-ui/core/Container";
 import Button from "@material-ui/core/Button";
 import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
-import QuestionComponent from "./QuestionComponent";
-import SummaryComponent from "./SummaryComponent";
+import Question from "./Question";
+import Summary from "./Summary";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
-import MenuComponent from "./MenuComponent";
+import Menu from "./Menu";
 import useCountDown from "react-countdown-hook";
 import {isAnswerCorrect} from "./utilities";
 import {useSnackbar} from "notistack";
@@ -105,7 +105,7 @@ function reducer(draft, action) {
   }
 }
 
-function QuizComponent({ countries }) {
+function Quiz({ countries }) {
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
@@ -189,7 +189,7 @@ function QuizComponent({ countries }) {
     <>
       <Container maxWidth="lg" style={{marginTop: "6em"}}>
         {state.view === "menu" && (
-          <MenuComponent
+          <Menu
             mode={state.mode}
             setMode={mode => dispatch({ type: "setMode", mode })}
             startGame={startGame}
@@ -197,7 +197,7 @@ function QuizComponent({ countries }) {
         )}
         {state.view === "question" && (
           <div style={{textAlign: "center"}}>
-            <QuestionComponent
+            <Question
               currentQuestion={state.currentQuestion}
               answers={state.answers}
               answer={answer}
@@ -215,7 +215,7 @@ function QuizComponent({ countries }) {
         )}
         {state.view === "summary" && (
           <>
-            <SummaryComponent answers={state.answers} />
+            <Summary answers={state.answers} />
             <div style={{textAlign: "center"}}>
               <Button
                 variant="contained"
@@ -255,4 +255,4 @@ function QuizComponent({ countries }) {
   );
 }
 
-export default QuizComponent;
+export default Quiz;

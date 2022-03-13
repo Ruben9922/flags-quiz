@@ -4,10 +4,10 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import React from "react";
 import * as R from "ramda";
-import TimerComponent from "./TimerComponent";
+import Timer from "./Timer";
 import {isAnswerCorrect} from "./utilities";
 
-function QuestionComponent({
+function Question({
   answers,
   currentQuestion,
   answered,
@@ -26,7 +26,7 @@ function QuestionComponent({
   return (
     <>
       {mode === "timed" && (
-        <TimerComponent
+        <Timer
           timeLeft={timeLeft}
           totalTime={totalTime}
           onCountdownEnd={onCountdownEnd}
@@ -68,4 +68,4 @@ function QuestionComponent({
   );
 }
 
-export default QuestionComponent;
+export default Question;

@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function MenuComponent({
+function Menu({
   mode,
   setMode,
   startGame,
@@ -57,4 +57,4 @@ function MenuComponent({
   );
 }
 
-export default MenuComponent;
+export default Menu;
