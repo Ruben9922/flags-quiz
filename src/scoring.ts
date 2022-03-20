@@ -1,6 +1,5 @@
 import * as R from "ramda";
-import {isAnswerCorrect} from "./utilities";
-import Answer from "./answer";
+import Answer, {isAnswerCorrect} from "./answer";
 
 // Constants and functions used in score and streak calculations
 export const scorePerStreak = 1000;

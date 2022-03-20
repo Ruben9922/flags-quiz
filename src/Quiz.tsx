@@ -5,7 +5,6 @@ import QuestionComponent from "./Question";
 import Summary from "./Summary";
 import Menu from "./Menu";
 import useCountDown from "react-countdown-hook";
-import {isAnswerCorrect} from "./utilities";
 import {computeStreak, isAllCorrectAchievement, isStreakAtThreshold} from "./scoring";
 import {
   AlertDialog,
@@ -21,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import Country from "./country";
 import Mode from "./mode";
-import Answer from "./answer";
+import Answer, {isAnswerCorrect} from "./answer";
 import Question from "./question";
 
 interface QuizProps {

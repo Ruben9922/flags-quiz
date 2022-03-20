@@ -9,10 +9,10 @@ import {
   Text,
   VStack
 } from "@chakra-ui/react";
-import {customHumanizer, isAnswerCorrect} from "./utilities";
+import {customHumanizer} from "./utilities";
 import ReactCountryFlag from "react-country-flag";
 import React from "react";
-import Answer from "./answer";
+import Answer, {isAnswerCorrect} from "./answer";
 
 interface AnswersAccordionProps {
   answers: Answer[];

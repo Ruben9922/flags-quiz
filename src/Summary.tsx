@@ -12,7 +12,7 @@ import {
   YAxis
 } from "react-vis";
 import '../node_modules/react-vis/dist/style.css';
-import {customHumanizer, formatInteger, formatIntegerWithSign, isAnswerCorrect} from "./utilities";
+import {customHumanizer, formatInteger, formatIntegerWithSign} from "./utilities";
 import {
   computeAllCorrectAchievementBonus,
   computeStreaks,
@@ -20,7 +20,7 @@ import {
   computeTotalStreakScore
 } from "./scoring";
 import {Button, Grid, Heading, Image, SimpleGrid, Text, useColorModeValue, VStack} from "@chakra-ui/react";
-import Answer from "./answer";
+import Answer, {isAnswerCorrect} from "./answer";
 import AnswersAccordion from "./AnswersAccordion";
 import Paper from "./Paper";
 import theme from "./theme";

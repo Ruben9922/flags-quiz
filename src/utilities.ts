@@ -1,10 +1,4 @@
-import * as R from "ramda";
 import humanizeDuration from "humanize-duration";
-import Answer from "./answer";
-
-export function isAnswerCorrect(answer: Answer): boolean {
-  return answer.selectedCountry !== null && R.equals(answer.correctCountry, answer.selectedCountry);
-}
 
 export const customHumanizer = humanizeDuration.humanizer({
   maxDecimalPoints: 1,
