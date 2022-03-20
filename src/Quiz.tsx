@@ -1,26 +1,58 @@
-import React from 'react';
-import Container from "@material-ui/core/Container";
-import Button from "@material-ui/core/Button";
+import React from "react";
 import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
-import Question from "./Question";
+import QuestionComponent from "./Question";
 import Summary from "./Summary";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import Menu from "./Menu";
 import useCountDown from "react-countdown-hook";
 import {isAnswerCorrect} from "./utilities";
-import {useSnackbar} from "notistack";
 import {computeStreak, isAllCorrectAchievement, isStreakAtThreshold} from "./scoring";
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
+  Container,
+  useToast,
+  VStack
+} from "@chakra-ui/react";
+import Country from "./country";
+import Mode from "./mode";
+import Answer from "./answer";
+import Question from "./question";
+
+interface QuizProps {
+  countries: Country[];
+}
+
+type View = "menu" | "question" | "summary";
+
+interface QuizState {
+  currentQuestion: Question;
+  answers: Answer[];
+  answered: boolean;
+  view: View;
+  mode: Mode;
+  timestamp: DOMHighResTimeStamp | null;
+}
+
+type QuizAction =
+  | { type: "answer", country: Country | null }
+  | { type: "resetQuestion", countries: Country[] }
+  | { type: "playAgain" }
+  | { type: "setMode", mode: Mode }
+  | { type: "endGame" }
+  | { type: "startGame", countries: Country[] };
 
 const initialTime = 10 * 1000;
 const interval = 1000;
 
-function pickCountries(countries) {
+function pickCountries(countries: Country[]): Country[] {
   const count = 4; // Technically, count must be less than the number of countries
-  let pickedCountries = [];
+  let pickedCountries: Country[] = [];
   for (let i = 0; i < count; i++) {
     // Choose an element from countries list with the already picked countries removed
     // Could be made more efficient by removing by index; for this you would have to store the list of available
@@ -31,11 +63,11 @@ function pickCountries(countries) {
   return pickedCountries;
 }
 
-function chooseElement(l) {
+function chooseElement<T>(l: T[]): T {
   return l[Math.floor(Math.random() * R.length(l))];
 }
 
-function init(countries) {
+function init(countries: Country[]): QuizState {
   const pickedCountries = pickCountries(countries);
 
   return {
@@ -51,14 +83,14 @@ function init(countries) {
   };
 }
 
-function reducer(draft, action) {
+function reducer(draft: QuizState, action: QuizAction): void {
   switch (action.type) {
     case "answer": {
       const answer = {
         countries: draft.currentQuestion.countries,
         correctCountry: draft.currentQuestion.correctCountry,
         selectedCountry: action.country,
-        timeTaken: action.country === null ? null : (performance.now() - draft.timestamp),
+        timeTaken: draft.timestamp === null || action.country === null ? null : (performance.now() - draft.timestamp),
       };
       draft.answers = R.append(answer, draft.answers);
 
@@ -78,7 +110,7 @@ function reducer(draft, action) {
       draft.answered = false;
       draft.timestamp = performance.now();
 
-      if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers))) {
+      if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!)) {
         draft.view = "summary";
       }
 
@@ -105,55 +137,59 @@ function reducer(draft, action) {
   }
 }
 
-function Quiz({ countries }) {
+function Quiz({ countries }: QuizProps) {
   const [state, dispatch] = useImmerReducer(reducer, init(countries));
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
-  const { enqueueSnackbar } = useSnackbar();
+  const toast = useToast();
+
+  const cancelRef = React.useRef(null);
 
   React.useEffect(() => {
     if (!R.isEmpty(state.answers)) {
-      if (isAnswerCorrect(R.last(state.answers))) {
-        enqueueSnackbar("Correct!", {
-          variant: "success",
+      if (isAnswerCorrect(R.last(state.answers)!)) {
+        toast({
+          description: "Correct!",
+          status: "success",
         });
 
         // Snackbar for consecutive correct answers
         const streak = computeStreak(state.answers);
         if (isStreakAtThreshold(streak)) {
-          setTimeout(() => enqueueSnackbar(`\u{1F389} Nice! ${streak} in a row!`), 500);
+          setTimeout(() => toast({ description: `\u{1F389} Nice! ${streak} in a row!` }), 500);
         }
       } else {
         let message = R.last(state.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!";
         if (R.last(state.answers)?.correctCountry) {
           message += ` It's the flag of ${R.last(state.answers)?.correctCountry.name}.`
         }
-        enqueueSnackbar(message, {
-          variant: "error",
+        toast({
+          description: message,
+          status: "error",
         });
 
         // Snackbar for losing a streak
         const prevStreak = computeStreak(R.init(state.answers));
         if (prevStreak >= 3) {
-          setTimeout(() => enqueueSnackbar(`\u{1F622} Awh! You just lost your streak of ${prevStreak}!`), 500);
+          setTimeout(() => toast({ description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!` }), 500);
         }
       }
     }
-  }, [state.answers, enqueueSnackbar]);
+  }, [state.answers, toast]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
     if (isAllCorrectAchievement(state.answers)) {
-      enqueueSnackbar("\u{1F389} Awesome! You got 100%!", { variant: "default" });
+      toast({ description: "\u{1F389} Awesome! You got 100%!" });
     }
-  }, [state.answers, enqueueSnackbar]);
+  }, [state.answers, toast]);
 
   React.useEffect(() => {
-    if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers))) {
-      setTimeout(() => enqueueSnackbar("Game over!", { variant: "default" }), 1500);
+    if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!)) {
+      setTimeout(() => toast({ description: "Game over!" }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
-  }, [state.answers, state.mode, enqueueSnackbar, displayAllCorrectSnackbar]);
+  }, [state.answers, state.mode, toast, displayAllCorrectSnackbar]);
 
   const startGame = () => {
     dispatch({ type: "startGame", countries });
@@ -173,31 +209,31 @@ function Quiz({ countries }) {
     [dispatch, resetQuestion],
   );
 
-  const answer = country => {
+  const answer = (country: Country) => {
     dispatch({ type: "answer", country });
     pause();
   };
 
   const endGame = () => {
     setDialogOpen(false);
-    dispatch({ type: "endGame", enqueueSnackbar });
-    enqueueSnackbar("Game over!", { variant: "default" });
+    dispatch({ type: "endGame" });
+    toast({ description: "Game over!" });
     setTimeout(displayAllCorrectSnackbar, 500);
   };
 
   return (
     <>
-      <Container maxWidth="lg" style={{marginTop: "6em"}}>
+      <Container maxW="container.lg">
         {state.view === "menu" && (
           <Menu
             mode={state.mode}
-            setMode={mode => dispatch({ type: "setMode", mode })}
+            setMode={(mode: Mode) => dispatch({ type: "setMode", mode })}
             startGame={startGame}
           />
         )}
         {state.view === "question" && (
-          <div style={{textAlign: "center"}}>
-            <Question
+          <VStack spacing={4}>
+            <QuestionComponent
               currentQuestion={state.currentQuestion}
               answers={state.answers}
               answer={answer}
@@ -208,49 +244,45 @@ function Quiz({ countries }) {
               totalTime={initialTime}
               onCountdownEnd={onCountdownEnd}
             />
-            <Button variant="contained" onClick={() => setDialogOpen(true)} style={{ marginTop: "25px" }}>
+            <Button onClick={() => setDialogOpen(true)}>
               End game
             </Button>
-          </div>
+          </VStack>
         )}
         {state.view === "summary" && (
-          <>
-            <Summary answers={state.answers} />
-            <div style={{textAlign: "center"}}>
-              <Button
-                variant="contained"
-                style={{ marginTop: "25px" }}
-                onClick={() => { dispatch({ type: "playAgain" }); }}>
-                Play again
-              </Button>
-            </div>
-          </>
+          <Summary
+            answers={state.answers}
+            playAgain={() => { dispatch({ type: "playAgain" }); }}
+          />
         )}
       </Container>
-      <Dialog
-        open={dialogOpen}
+
+      <AlertDialog
+        isOpen={dialogOpen}
+        leastDestructiveRef={cancelRef}
         onClose={() => setDialogOpen(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
       >
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you wish to end the game?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={endGame}
-            color="primary"
-            autoFocus
-          >
-            End game
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+              End Game
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure you wish to end the game?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={endGame} ml={3}>
+                End game
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </>
   );
 }

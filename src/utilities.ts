@@ -1,7 +1,8 @@
 import * as R from "ramda";
 import humanizeDuration from "humanize-duration";
+import Answer from "./answer";
 
-export function isAnswerCorrect(answer) {
+export function isAnswerCorrect(answer: Answer): boolean {
   return answer.selectedCountry !== null && R.equals(answer.correctCountry, answer.selectedCountry);
 }
 
@@ -26,11 +27,11 @@ export const customHumanizer = humanizeDuration.humanizer({
   },
 });
 
-export const formatInteger = x => x.toLocaleString(undefined, {
+export const formatInteger = (x: number): string => x.toLocaleString(undefined, {
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
-export const formatIntegerWithSign = x => x.toLocaleString(undefined, {
+export const formatIntegerWithSign = (x: number): string => x.toLocaleString(undefined, {
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
   signDisplay: "always",
