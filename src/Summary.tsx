@@ -95,16 +95,12 @@ function Summary({answers, playAgain}: SummaryProps) {
           <Text>
             No answers to show.
           </Text>
-          {/*<Grid container style={{marginTop: "2.5em", marginBottom: "1em"}} justify="center" spacing={3}>*/}
-          {/*  <Grid item xs={8} sm={6} md={4} style={{ textAlign: "center" }}>*/}
-              <Image
-                src={EmptyStreetSplash}
-                alt="Empty street splash"
-                htmlWidth="400px"
-                alignSelf="center"
-              />
-          {/*  </Grid>*/}
-          {/*</Grid>*/}
+          <Image
+            src={EmptyStreetSplash}
+            alt="Empty street splash"
+            htmlWidth="400px"
+            alignSelf="center"
+          />
         </>
       ) : (
         <>

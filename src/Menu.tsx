@@ -10,32 +10,6 @@ interface MenuProps {
 
 function Menu({mode, setMode, startGame}: MenuProps) {
   return (
-      //   <FormControl component="fieldset">
-      //     <FormLabel component="legend">Game mode</FormLabel>
-      //     <RadioGroup aria-label="game mode" name="mode" value={mode} onChange={event => setMode(event.target.value)}>
-      //       <FormControlLabel value= control={<Radio/>} label={
-      //         <div className={classes.textWithIcon}>
-      //
-      //           &thinsp;
-      //           <Tooltip
-      //             arrow
-      //             placement="right"
-      //             title=""
-      //           >
-      //             <HelpIcon color="primary"/>
-      //           </Tooltip>
-      //         </div>
-      //       }/>
-      //       <FormControlLabel value="" control={<Radio/>} label=""/>
-      //       <FormControlLabel value= control={<Radio/>} label=""/>
-      //     </RadioGroup>
-      //   </FormControl>
-      // </Grid>
-      // <Grid item>
-      //   <Button variant="contained" color="primary"  style={{marginTop: "20px"}}>
-      //
-      //   </Button>
-      // </Grid>
     <VStack spacing={4}>
       <FormControl w="auto" as="fieldset">
         <FormLabel as="legend">Game mode</FormLabel>

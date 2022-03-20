@@ -23,17 +23,6 @@ function NavBar() {
                   isExternal
                   as={Link}
                 />
-                {/*<IconButton*/}
-                {/*  color="current"*/}
-                {/*  variant={colorMode === "light" ? "link" : "link"}*/}
-                {/*  icon={<FaGithub />}*/}
-                {/*  aria-label="GitHub repository"*/}
-                {/*  href="https://github.com/Ruben9922/flags-quiz"*/}
-                {/*  isExternal*/}
-                {/*  as={Link}*/}
-                {/*  transition="color 0.2s"*/}
-                {/*  _hover={{color: "gray.500"}}*/}
-                {/*/>*/}
               </Tooltip>
               <Tooltip label="Toggle dark mode" hasArrow>
                 <IconButton

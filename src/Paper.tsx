@@ -9,8 +9,6 @@ function Paper({children, ...props}: PaperProps) {
   return (
     <Box
       borderRadius="lg"
-      // bg="gray.700"
-      // color="whiteAlpha.900"
       bg={useColorModeValue("white", "gray.700")}
       py={3}
       px={4}
