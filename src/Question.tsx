@@ -20,6 +20,16 @@ interface QuestionProps {
   onCountdownEnd: () => void;
 }
 
+function computeButtonColor(answered: boolean, country: Country, correctCountry: Country, selectedCountry: Country | null): "green" | "red" | "gray" {
+  if (answered && country === correctCountry) {
+    return "green";
+  }
+  if (answered && country === selectedCountry) {
+    return "red";
+  }
+  return "gray";
+}
+
 function Question({
                     answers,
                     currentQuestion,
@@ -71,6 +81,7 @@ function Question({
             height="auto"
             whiteSpace="normal"
             paddingY={4}
+            colorScheme={computeButtonColor(answered, country, currentQuestion.correctCountry, R.last(answers)?.selectedCountry ?? null)}
           >
             {country.name}
           </Button>
