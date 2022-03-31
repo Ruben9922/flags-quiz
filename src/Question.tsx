@@ -20,7 +20,10 @@ interface QuestionProps {
   onCountdownEnd: () => void;
 }
 
-function computeButtonColor(answered: boolean, country: Country, correctCountry: Country, selectedCountry: Country | null): "green" | "red" | "gray" {
+function computeButtonColor(answered: boolean, country: Country, correctCountry: Country, selectedCountry: Country | null): "blue" | "green" | "red" | "gray" {
+  if (answered && country === correctCountry && selectedCountry === null) {
+    return "blue";
+  }
   if (answered && country === correctCountry) {
     return "green";
   }
