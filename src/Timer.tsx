@@ -1,5 +1,6 @@
 import React from "react";
 import {Grid, Progress, Text} from "@chakra-ui/react";
+import {customHumanizer} from "./utilities";
 
 interface TimerProps {
   timeLeft: number;
@@ -21,7 +22,7 @@ function Timer({
   return (
     <Grid templateColumns="1fr auto" alignSelf="stretch" alignItems="center" gap={4}>
       <Progress value={(totalTime - timeLeft) * (100 / totalTime)} />
-      <Text>{`${timeLeft / 1000}s`}</Text>
+      <Text>{customHumanizer(timeLeft, { maxDecimalPoints: 0 })}</Text>
     </Grid>
   );
 }

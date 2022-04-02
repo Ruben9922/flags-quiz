@@ -47,7 +47,7 @@ type QuizAction =
   | { type: "startGame", countries: Country[] };
 
 const initialTime = 10 * 1000;
-const interval = 1000;
+const interval = 50;
 
 function pickCountries(countries: Country[]): Country[] {
   const count = 4; // Technically, count must be less than the number of countries
