@@ -1,5 +1,5 @@
 import React from "react";
-import {Progress, Text} from "@chakra-ui/react";
+import {Grid, Progress, Text} from "@chakra-ui/react";
 
 interface TimerProps {
   timeLeft: number;
@@ -19,10 +19,10 @@ function Timer({
   }, [timeLeft, onCountdownEnd]);
 
   return (
-    <>
-      <Progress value={(totalTime - timeLeft) * (100 / totalTime)} width="100%" />
+    <Grid templateColumns="1fr auto" alignSelf="stretch" alignItems="center" gap={4}>
+      <Progress value={(totalTime - timeLeft) * (100 / totalTime)} />
       <Text>{`${timeLeft / 1000}s`}</Text>
-    </>
+    </Grid>
   );
 }
 
