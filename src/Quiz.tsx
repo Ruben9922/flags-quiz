@@ -49,6 +49,29 @@ type QuizAction =
 const initialTime = 10 * 1000;
 const interval = 50;
 
+function removeCountriesWithSimilarFlags(countries: Country[], pickedCountries: Country[]): Country[] {
+  // Using country codes only as these are probably more stable than country names
+  const countryCodesWithSimilarFlags: string[][] = [
+    [
+      "RO", // Romania
+      "TD", // Chad
+    ],
+    [
+      "MC", // Monaco
+      "ID", // Indonesia
+    ],
+  ];
+  const pickedCountryCodes = R.map((country: Country) => country.alpha2Code, pickedCountries);
+  // List of country codes to remove - specifically countries in the same group as any picked country
+  // E.g. If Romania has been picked, we want to remove Romania and Chad (but keep Monaco and Indonesia)
+  const countryCodesToRemove = R.flatten(R.filter(
+    (countryCodeGroup: string[]) => !R.isEmpty(R.intersection(pickedCountryCodes, countryCodeGroup)),
+    countryCodesWithSimilarFlags,
+  ));
+  // Remove countries whose country codes are in this list
+  return R.reject((country: Country) => R.includes(country.alpha2Code, countryCodesToRemove), countries);
+}
+
 function pickCountries(countries: Country[]): Country[] {
   const count = 4; // Technically, count must be less than the number of countries
   let pickedCountries: Country[] = [];
@@ -56,7 +79,9 @@ function pickCountries(countries: Country[]): Country[] {
     // Choose an element from countries list with the already picked countries removed
     // Could be made more efficient by removing by index; for this you would have to store the list of available
     // countries and remove from this each time
-    const pickedCountry = chooseElement(R.without(pickedCountries, countries));
+    let availableCountries = R.without(pickedCountries, countries);
+    availableCountries = removeCountriesWithSimilarFlags(availableCountries, pickedCountries);
+    const pickedCountry = chooseElement(availableCountries);
     pickedCountries = R.append(pickedCountry, pickedCountries);
   }
   return pickedCountries;
