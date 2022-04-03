@@ -1,11 +1,7 @@
 import React from "react";
 import {Box, BoxProps, useColorModeValue} from "@chakra-ui/react";
 
-type PaperProps = BoxProps & {
-  children: React.ReactNode;
-}
-
-function Paper({children, ...props}: PaperProps) {
+function Paper(props: BoxProps) {
   return (
     <Box
       borderRadius="lg"
@@ -14,9 +10,7 @@ function Paper({children, ...props}: PaperProps) {
       px={4}
       boxShadow="lg"
       {...props}
-    >
-      {children}
-    </Box>
+    />
   );
 }
 
