@@ -73,7 +73,14 @@ function removeCountriesWithSimilarFlags(countries: Country[], pickedCountries: 
 }
 
 function pickCountries(countries: Country[]): Country[] {
-  const count = 4; // Technically, count must be less than the number of countries
+  const count = 4;
+
+  // If the number of countries to pick is greater than or equal to the total number of countries, then just return the
+  // entire list of countries
+  if (R.length(countries) <= count) {
+    return countries;
+  }
+
   let pickedCountries: Country[] = [];
   for (let i = 0; i < count; i++) {
     // Choose an element from countries list with the already picked countries removed
