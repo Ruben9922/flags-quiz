@@ -30,7 +30,7 @@ interface QuizProps {
 type View = "menu" | "question" | "summary";
 
 interface QuizState {
-  currentQuestion: Question;
+  currentQuestion: Question | null;
   answers: Answer[];
   answered: boolean;
   view: View;
@@ -91,36 +91,31 @@ function chooseElement<T>(l: T[]): T {
   return l[Math.floor(Math.random() * R.length(l))];
 }
 
-function init(countries: Country[]): QuizState {
-  const pickedCountries = pickCountries(countries);
-
-  return {
-    currentQuestion: {
-      countries: pickedCountries,
-      correctCountry: chooseElement(pickedCountries),
-    },
-    answers: [],
-    answered: false,
-    view: "menu",
-    mode: "classic",
-    timestamp: null,
-  };
-}
+const initialState: QuizState = {
+  currentQuestion: null,
+  answers: [],
+  answered: false,
+  view: "menu",
+  mode: "classic",
+  timestamp: null,
+};
 
 function reducer(draft: QuizState, action: QuizAction): void {
   switch (action.type) {
     case "answer": {
-      const answer = {
-        countries: draft.currentQuestion.countries,
-        correctCountry: draft.currentQuestion.correctCountry,
-        selectedCountry: action.country,
-        timeTaken: draft.timestamp === null || action.country === null ? null : (performance.now() - draft.timestamp),
-      };
-      draft.answers = R.append(answer, draft.answers);
+      if (draft.currentQuestion !== null) {
+        const answer = {
+          countries: draft.currentQuestion.countries,
+          correctCountry: draft.currentQuestion.correctCountry,
+          selectedCountry: action.country,
+          timeTaken: draft.timestamp === null || action.country === null ? null : (performance.now() - draft.timestamp),
+        };
+        draft.answers = R.append(answer, draft.answers);
 
-      // draft.currentQuestion = null;
-      draft.answered = true;
-      draft.timestamp = null;
+        // draft.currentQuestion = null;
+        draft.answered = true;
+        draft.timestamp = null;
+      }
 
       return;
     }
@@ -162,7 +157,7 @@ function reducer(draft: QuizState, action: QuizAction): void {
 }
 
 function Quiz({ countries }: QuizProps) {
-  const [state, dispatch] = useImmerReducer(reducer, init(countries));
+  const [state, dispatch] = useImmerReducer(reducer, initialState);
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
@@ -255,7 +250,7 @@ function Quiz({ countries }: QuizProps) {
             startGame={startGame}
           />
         )}
-        {state.view === "question" && (
+        {state.view === "question" && state.currentQuestion !== null && (
           <VStack spacing={4}>
             <QuestionComponent
               currentQuestion={state.currentQuestion}
