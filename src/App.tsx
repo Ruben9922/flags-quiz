@@ -28,7 +28,11 @@ export default function App() {
             <CircularProgress isIndeterminate />
           </Container>
         )}
-        {data && <Quiz countries={data} />}
+        {data && (
+          <Container maxW="container.lg">
+            <Quiz countries={data} />
+          </Container>
+        )}
       </VStack>
     </ChakraProvider>
   )

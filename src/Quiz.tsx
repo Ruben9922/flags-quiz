@@ -14,7 +14,6 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  Container,
   useToast,
   VStack
 } from "@chakra-ui/react";
@@ -249,39 +248,37 @@ function Quiz({ countries }: QuizProps) {
 
   return (
     <>
-      <Container maxW="container.lg">
-        {state.view === "menu" && (
-          <Menu
-            mode={state.mode}
-            setMode={(mode: Mode) => dispatch({ type: "setMode", mode })}
-            startGame={startGame}
-          />
-        )}
-        {state.view === "question" && state.currentQuestion !== null && (
-          <VStack spacing={4}>
-            <QuestionComponent
-              currentQuestion={state.currentQuestion}
-              answers={state.answers}
-              answer={answer}
-              resetQuestion={resetQuestion}
-              answered={state.answered}
-              mode={state.mode}
-              timeLeft={timeLeft}
-              totalTime={initialTime}
-              onCountdownEnd={onCountdownEnd}
-            />
-            <Button onClick={() => setDialogOpen(true)}>
-              End game
-            </Button>
-          </VStack>
-        )}
-        {state.view === "summary" && (
-          <Summary
+      {state.view === "menu" && (
+        <Menu
+          mode={state.mode}
+          setMode={(mode: Mode) => dispatch({ type: "setMode", mode })}
+          startGame={startGame}
+        />
+      )}
+      {state.view === "question" && state.currentQuestion !== null && (
+        <VStack spacing={4}>
+          <QuestionComponent
+            currentQuestion={state.currentQuestion}
             answers={state.answers}
-            playAgain={() => { dispatch({ type: "playAgain" }); }}
+            answer={answer}
+            resetQuestion={resetQuestion}
+            answered={state.answered}
+            mode={state.mode}
+            timeLeft={timeLeft}
+            totalTime={initialTime}
+            onCountdownEnd={onCountdownEnd}
           />
-        )}
-      </Container>
+          <Button onClick={() => setDialogOpen(true)}>
+            End game
+          </Button>
+        </VStack>
+      )}
+      {state.view === "summary" && (
+        <Summary
+          answers={state.answers}
+          playAgain={() => { dispatch({ type: "playAgain" }); }}
+        />
+      )}
 
       <AlertDialog
         isOpen={dialogOpen}
