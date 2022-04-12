@@ -13,7 +13,7 @@ export default function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <VStack spacing={6}>
+      <VStack spacing={6} pb={8}>
         <NavBar />
         {error && (
           <Container maxW="container.md">
