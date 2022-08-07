@@ -15,21 +15,13 @@ import '../node_modules/react-vis/dist/style.css';
 import {customHumanizer, formatInteger, formatIntegerWithSign} from "./utilities";
 import {
   computeAllCorrectAchievementBonus,
+  computeCorrectAnswersTimeTaken,
   computeStreaks,
   computeTotalBaseScore,
+  computeTotalScore,
   computeTotalStreakScore
 } from "./scoring";
-import {
-  Box,
-  Button,
-  Grid,
-  Heading,
-  Image,
-  SimpleGrid,
-  Text,
-  useColorModeValue,
-  VStack
-} from "@chakra-ui/react";
+import {Box, Button, Grid, Heading, Image, SimpleGrid, Text, useColorModeValue, VStack} from "@chakra-ui/react";
 import Answer, {isAnswerCorrect} from "./answer";
 import AnswersAccordion from "./AnswersAccordion";
 import theme from "./theme";
@@ -155,8 +147,7 @@ function Summary({answers, playAgain}: SummaryProps) {
     }),
     answers
   );
-
-  const correctAnswersTimeTaken = R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer) && answer.timeTaken !== null, answers));
+  const correctAnswersTimeTaken = computeCorrectAnswersTimeTaken(answers);
   const streaks = computeStreaks(answers);
 
   // Calculate score
@@ -164,7 +155,7 @@ function Summary({answers, playAgain}: SummaryProps) {
   const totalBaseScore = computeTotalBaseScore(correctAnswersTimeTaken);
   const totalStreakScore = computeTotalStreakScore(streaks);
   const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers);
-  const totalScore = totalBaseScore + totalStreakScore + allCorrectAchievementBonus;
+  const totalScore = computeTotalScore(totalBaseScore, totalStreakScore, allCorrectAchievementBonus);
 
   const maxStreak = R.apply(Math.max, streaks);
   const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);

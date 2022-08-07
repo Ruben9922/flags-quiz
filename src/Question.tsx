@@ -3,10 +3,19 @@ import ReactCountryFlag from "react-country-flag";
 import * as R from "ramda";
 import Timer from "./Timer";
 import {Button, SimpleGrid, Text} from "@chakra-ui/react";
-import Answer, {isAnswerCorrect} from "./answer";
+import Answer from "./answer";
 import QuestionType from "./question";
 import Mode from "./mode";
 import Country from "./country";
+import {
+  computeAllCorrectAchievementBonus,
+  computeCorrectAnswersTimeTaken,
+  computeStreaks,
+  computeTotalBaseScore,
+  computeTotalScore,
+  computeTotalStreakScore
+} from "./scoring";
+import {formatInteger} from "./utilities";
 
 interface QuestionProps {
   answers: Answer[];
@@ -59,7 +68,7 @@ function Question({
         />
       )}
       <Text>
-        Score: {R.length(R.filter(isAnswerCorrect, answers))}/{R.length(answers)}
+        Score: {formatInteger(computeTotalScore(computeTotalBaseScore(computeCorrectAnswersTimeTaken(answers)), computeTotalStreakScore(computeStreaks(answers)), computeAllCorrectAchievementBonus(answers)))}
       </Text>
       <ReactCountryFlag
         countryCode={currentQuestion.correctCountry.alpha2Code}

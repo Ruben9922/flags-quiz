@@ -27,6 +27,10 @@ export function computeBaseScore(time: number): number {
   return 1000000 / time;
 }
 
+export function computeCorrectAnswersTimeTaken(answers: Answer[]) {
+  return R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer) && answer.timeTaken !== null, answers));
+}
+
 export function computeTotalBaseScore(times: number[]): number {
   return R.sum(R.map(computeBaseScore, times));
 }
@@ -41,6 +45,10 @@ export function computeStreakScore(streak: number): number {
 
 export function computeTotalStreakScore(streaks: number[]): number {
   return R.sum(R.map(computeStreakScore, streaks));
+}
+
+export function computeTotalScore(totalBaseScore: number, totalStreakScore: number, allCorrectAchievementBonus: number) {
+  return totalBaseScore + totalStreakScore + allCorrectAchievementBonus;
 }
 
 export function isAllCorrectAchievement(answers: Answer[]): boolean {
