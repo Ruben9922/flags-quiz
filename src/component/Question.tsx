@@ -7,14 +7,7 @@ import Answer from "../core/answer";
 import QuestionType from "../core/question";
 import Mode from "../core/mode";
 import Country from "../core/country";
-import {
-  computeAllCorrectAchievementBonus,
-  computeCorrectAnswersTimeTaken,
-  computeStreaks,
-  computeTotalBaseScore,
-  computeTotalScore,
-  computeTotalStreakScore
-} from "../core/scoring";
+import {computeScores} from "../core/scoring";
 import {formatInteger} from "../core/utilities";
 
 interface QuestionProps {
@@ -68,7 +61,7 @@ function Question({
         />
       )}
       <Text>
-        Score: {formatInteger(computeTotalScore(computeTotalBaseScore(computeCorrectAnswersTimeTaken(answers)), computeTotalStreakScore(computeStreaks(answers)), computeAllCorrectAchievementBonus(answers)))}
+        Score: {formatInteger(computeScores(answers).totalScore)}
       </Text>
       <ReactCountryFlag
         countryCode={currentQuestion.correctCountry.alpha2Code}

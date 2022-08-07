@@ -13,14 +13,7 @@ import {
 } from "react-vis";
 import 'react-vis/dist/style.css';
 import {customHumanizer, formatInteger, formatIntegerWithSign} from "../core/utilities";
-import {
-  computeAllCorrectAchievementBonus,
-  computeCorrectAnswersTimeTaken,
-  computeStreaks,
-  computeTotalBaseScore,
-  computeTotalScore,
-  computeTotalStreakScore
-} from "../core/scoring";
+import {computeScores} from "../core/scoring";
 import {Box, Button, Grid, Heading, Image, SimpleGrid, Text, useColorModeValue, VStack} from "@chakra-ui/react";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import AnswersAccordion from "./AnswersAccordion";
@@ -147,19 +140,12 @@ function Summary({answers, playAgain}: SummaryProps) {
     }),
     answers
   );
-  const correctAnswersTimeTaken = computeCorrectAnswersTimeTaken(answers);
-  const streaks = computeStreaks(answers);
 
-  // Calculate score
-  // Base score is a score for answering a question, based on the time taken
-  const totalBaseScore = computeTotalBaseScore(correctAnswersTimeTaken);
-  const totalStreakScore = computeTotalStreakScore(streaks);
-  const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers);
-  const totalScore = computeTotalScore(totalBaseScore, totalStreakScore, allCorrectAchievementBonus);
+  const scores = computeScores(answers);
 
-  const maxStreak = R.apply(Math.max, streaks);
-  const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
-  const averageTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.mean(correctAnswersTimeTaken);
+  const maxStreak = R.apply(Math.max, scores.streaks);
+  const minTimeTaken = R.isEmpty(scores.correctAnswersTimeTaken) ? null : R.apply(Math.min, scores.correctAnswersTimeTaken);
+  const averageTimeTaken = R.isEmpty(scores.correctAnswersTimeTaken) ? null : R.mean(scores.correctAnswersTimeTaken);
 
   const chartColor = useColorModeValue(theme.colors.gray["800"], theme.colors.whiteAlpha["900"]);
   const gridLinesStyle = {stroke: chartColor, opacity: 0.1, strokeDasharray: "1 1"};
@@ -194,10 +180,10 @@ function Summary({answers, playAgain}: SummaryProps) {
           >
             <MotionBox variants={itemVariant} alignSelf="center">
               <ScoreCard
-                totalScore={totalScore}
-                totalBaseScore={totalBaseScore}
-                totalStreakScore={totalStreakScore}
-                allCorrectAchievementBonus={allCorrectAchievementBonus}
+                totalScore={scores.totalScore}
+                totalBaseScore={scores.totalBaseScore}
+                totalStreakScore={scores.totalStreakScore}
+                allCorrectAchievementBonus={scores.allCorrectAchievementBonus}
               />
             </MotionBox>
             <MotionBox variants={itemVariant}>
