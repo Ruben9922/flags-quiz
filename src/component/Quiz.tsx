@@ -5,7 +5,7 @@ import QuestionComponent from "./Question";
 import Summary from "./Summary";
 import Menu from "./Menu";
 import useCountDown from "react-countdown-hook";
-import {computeStreak, isAllCorrectAchievement, isStreakAtThreshold} from "./scoring";
+import {computeStreak, isAllCorrectAchievement, isStreakAtThreshold} from "../core/scoring";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -17,10 +17,10 @@ import {
   useToast,
   VStack
 } from "@chakra-ui/react";
-import Country from "./country";
-import Mode from "./mode";
-import Answer, {isAnswerCorrect} from "./answer";
-import Question from "./question";
+import Country from "../core/country";
+import Mode from "../core/mode";
+import Answer, {isAnswerCorrect} from "../core/answer";
+import Question from "../core/question";
 
 interface QuizProps {
   countries: Country[];

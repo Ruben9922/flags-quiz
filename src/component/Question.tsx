@@ -3,10 +3,10 @@ import ReactCountryFlag from "react-country-flag";
 import * as R from "ramda";
 import Timer from "./Timer";
 import {Button, SimpleGrid, Text} from "@chakra-ui/react";
-import Answer from "./answer";
-import QuestionType from "./question";
-import Mode from "./mode";
-import Country from "./country";
+import Answer from "../core/answer";
+import QuestionType from "../core/question";
+import Mode from "../core/mode";
+import Country from "../core/country";
 import {
   computeAllCorrectAchievementBonus,
   computeCorrectAnswersTimeTaken,
@@ -14,8 +14,8 @@ import {
   computeTotalBaseScore,
   computeTotalScore,
   computeTotalStreakScore
-} from "./scoring";
-import {formatInteger} from "./utilities";
+} from "../core/scoring";
+import {formatInteger} from "../core/utilities";
 
 interface QuestionProps {
   answers: Answer[];

@@ -1,6 +1,6 @@
 import React from "react";
 import * as R from "ramda";
-import EmptyStreetSplash from "./undraw_empty_street_sfxm.svg";
+import EmptyStreetSplash from "../undraw_empty_street_sfxm.svg";
 import {
   FlexibleWidthXYPlot,
   HorizontalGridLines,
@@ -11,8 +11,8 @@ import {
   XAxis,
   YAxis
 } from "react-vis";
-import '../node_modules/react-vis/dist/style.css';
-import {customHumanizer, formatInteger, formatIntegerWithSign} from "./utilities";
+import 'react-vis/dist/style.css';
+import {customHumanizer, formatInteger, formatIntegerWithSign} from "../core/utilities";
 import {
   computeAllCorrectAchievementBonus,
   computeCorrectAnswersTimeTaken,
@@ -20,11 +20,11 @@ import {
   computeTotalBaseScore,
   computeTotalScore,
   computeTotalStreakScore
-} from "./scoring";
+} from "../core/scoring";
 import {Box, Button, Grid, Heading, Image, SimpleGrid, Text, useColorModeValue, VStack} from "@chakra-ui/react";
-import Answer, {isAnswerCorrect} from "./answer";
+import Answer, {isAnswerCorrect} from "../core/answer";
 import AnswersAccordion from "./AnswersAccordion";
-import theme from "./theme";
+import theme from "../theme";
 import Paper from "./Paper";
 import {motion} from "framer-motion";
 

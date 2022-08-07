@@ -1,6 +1,6 @@
 import React from "react";
 import {Grid, Progress, Text} from "@chakra-ui/react";
-import {customHumanizer} from "./utilities";
+import {customHumanizer} from "../core/utilities";
 
 interface TimerProps {
   timeLeft: number;
