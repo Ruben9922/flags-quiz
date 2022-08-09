@@ -9,16 +9,19 @@ import {
   Text,
   VStack
 } from "@chakra-ui/react";
-import {customHumanizer} from "../core/utilities";
+import {customHumanizer, formatInteger} from "../core/utilities";
 import ReactCountryFlag from "react-country-flag";
 import React from "react";
 import Answer, {isAnswerCorrect} from "../core/answer";
+import {computeBaseScore} from "../core/scoring";
+import Mode from "../core/mode";
 
 interface AnswersAccordionProps {
   answers: Answer[];
+  mode: Mode;
 }
 
-function AnswersAccordion({answers}: AnswersAccordionProps) {
+function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
   return (
     <Accordion allowMultiple>
       {answers.map((answer, index) => (
@@ -35,7 +38,7 @@ function AnswersAccordion({answers}: AnswersAccordionProps) {
             </AccordionButton>
           </h2>
           <AccordionPanel pb={4}>
-            <Grid templateColumns="auto 1fr" gap={10} alignItems="center">
+            <Grid templateColumns="auto 1fr 1fr" gap={10} alignItems="center">
               <ReactCountryFlag
                 countryCode={answer.correctCountry.alpha2Code}
                 style={{
@@ -60,8 +63,13 @@ function AnswersAccordion({answers}: AnswersAccordionProps) {
                       </Text>
                     </>
                   )}
+              </VStack>
+              <VStack alignItems="start" spacing={0}>
                 <Text>
                   <span role="img" aria-label="time">⏳</span> {answer.timeTaken === null ? "—" : customHumanizer(answer.timeTaken)}
+                </Text>
+                <Text>
+                  <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, mode))}
                 </Text>
               </VStack>
             </Grid>

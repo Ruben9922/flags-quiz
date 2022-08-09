@@ -251,7 +251,7 @@ function Summary({answers, playAgain, mode}: SummaryProps) {
               </SimpleGrid>
             </MotionBox>
             <MotionBox variants={itemVariant}>
-              <AnswersAccordion answers={answers} />
+              <AnswersAccordion answers={answers} mode={mode} />
             </MotionBox>
           </MotionVStack>
         </>

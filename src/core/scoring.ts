@@ -32,7 +32,7 @@ function computeStreaks(answers: Answer[]): number[] {
     , [0], answers);
 }
 
-function computeBaseScore(answer: Answer, mode: Mode): number {
+export function computeBaseScore(answer: Answer, mode: Mode): number {
   if (!isAnswerCorrect(answer) || answer.timeTaken === null) {
     return 0;
   }
