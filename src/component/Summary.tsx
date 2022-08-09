@@ -20,6 +20,7 @@ import AnswersAccordion from "./AnswersAccordion";
 import theme from "../theme";
 import Paper from "./Paper";
 import {motion} from "framer-motion";
+import Mode from "../core/mode";
 
 const MotionVStack = motion(VStack);
 const MotionBox = motion(Box);
@@ -115,9 +116,10 @@ function StatisticCard({label, value}: StatisticCardProps) {
 interface SummaryProps {
   answers: Answer[];
   playAgain: () => void;
+  mode: Mode;
 }
 
-function Summary({answers, playAgain}: SummaryProps) {
+function Summary({answers, playAgain, mode}: SummaryProps) {
   type CumulativeScoreChartData = { x: number, y: number };
   const cumulativeScoreChartData = R.addIndex<number, CumulativeScoreChartData>(R.map)(
     (value, index) => ({ x: index, y: value }),
@@ -141,11 +143,12 @@ function Summary({answers, playAgain}: SummaryProps) {
     answers
   );
 
-  const scores = computeScores(answers);
+  const scores = computeScores(answers, mode);
 
+  const correctAnswersTimeTaken = R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer) && answer.timeTaken !== null, answers));
   const maxStreak = R.apply(Math.max, scores.streaks);
-  const minTimeTaken = R.isEmpty(scores.correctAnswersTimeTaken) ? null : R.apply(Math.min, scores.correctAnswersTimeTaken);
-  const averageTimeTaken = R.isEmpty(scores.correctAnswersTimeTaken) ? null : R.mean(scores.correctAnswersTimeTaken);
+  const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
+  const averageTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.mean(correctAnswersTimeTaken);
 
   const chartColor = useColorModeValue(theme.colors.gray["800"], theme.colors.whiteAlpha["900"]);
   const gridLinesStyle = {stroke: chartColor, opacity: 0.1, strokeDasharray: "1 1"};

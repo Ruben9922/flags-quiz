@@ -277,6 +277,7 @@ function Quiz({ countries }: QuizProps) {
         <Summary
           answers={state.answers}
           playAgain={() => { dispatch({ type: "playAgain" }); }}
+          mode={state.mode}
         />
       )}
 

@@ -61,7 +61,7 @@ function Question({
         />
       )}
       <Text>
-        Score: {formatInteger(computeScores(answers).totalScore)}
+        Score: {formatInteger(computeScores(answers, mode).totalScore)}
       </Text>
       <ReactCountryFlag
         countryCode={currentQuestion.correctCountry.alpha2Code}
