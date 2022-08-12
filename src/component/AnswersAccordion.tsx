@@ -27,13 +27,24 @@ interface AnswersAccordionProps {
 
 function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
   const [expandedIndices, setExpandedIndices] = useState<ExpandedIndex>([]);
+
   return (
     <VStack align="stretch" spacing={4}>
       <HStack spacing={2} justify="right">
-        <Button size="sm" variant="outline" onClick={() => setExpandedIndices(R.range(0, R.length(answers)))}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setExpandedIndices(R.range(0, R.length(answers)))}
+          isDisabled={Array.isArray(expandedIndices) && R.length(expandedIndices) === R.length(answers)}
+        >
           Expand all
         </Button>
-        <Button size="sm" variant="outline" onClick={() => setExpandedIndices([])}>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setExpandedIndices([])}
+          isDisabled={R.isEmpty(expandedIndices)}
+        >
           Collapse all
         </Button>
       </HStack>
