@@ -1,8 +1,7 @@
 import React from "react";
-import ReactCountryFlag from "react-country-flag";
 import * as R from "ramda";
 import Timer from "./Timer";
-import {Button, SimpleGrid, Text} from "@chakra-ui/react";
+import {Button, Image, SimpleGrid, Text} from "@chakra-ui/react";
 import Answer from "../core/answer";
 import QuestionType from "../core/question";
 import Mode from "../core/mode";
@@ -63,13 +62,14 @@ function Question({
       <Text>
         Score: {formatInteger(computeScores(answers, mode).totalScore)}
       </Text>
-      <ReactCountryFlag
-        countryCode={currentQuestion.correctCountry.cca2}
-        svg
-        style={{
-          width: '10em',
-          height: '10em',
-        }}
+      <Image
+        src={currentQuestion.correctCountry.flags.svg}
+        htmlWidth="160"
+        htmlHeight="160"
+        fallbackSrc="https://via.placeholder.com/160"
+        height="160px"
+        fit="contain"
+        alt="Flag"
       />
       <SimpleGrid
         columns={[1, null, 2]}

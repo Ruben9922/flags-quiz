@@ -6,11 +6,11 @@ import {
   AccordionPanel,
   Box,
   Grid,
+  Image,
   Text,
   VStack
 } from "@chakra-ui/react";
 import {customHumanizer, formatInteger} from "../core/utilities";
-import ReactCountryFlag from "react-country-flag";
 import React from "react";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import {computeBaseScore} from "../core/scoring";
@@ -39,12 +39,15 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
           </h2>
           <AccordionPanel pb={4}>
             <Grid templateColumns="auto 1fr 1fr" gap={10} alignItems="center">
-              <ReactCountryFlag
-                countryCode={answer.correctCountry.cca2}
-                style={{
-                  fontSize: "6em",
-                  gridColumn: 1,
-                }}
+              <Image
+                src={answer.correctCountry.flags.svg}
+                htmlWidth="100"
+                htmlHeight="80"
+                fallbackSrc="https://via.placeholder.com/100x80"
+                height="80px"
+                fit="contain"
+                alt="Flag"
+                marginY="5px"
               />
               <VStack alignItems="start" spacing={0}>
                   {isAnswerCorrect(answer) ? (
