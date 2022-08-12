@@ -1,4 +1,4 @@
 export default interface Country {
-  name: string;
-  alpha2Code: string;
+  name: { common: string };
+  cca2: string;
 }

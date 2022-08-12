@@ -60,7 +60,7 @@ function removeCountriesWithSimilarFlags(countries: Country[], pickedCountries: 
       "ID", // Indonesia
     ],
   ];
-  const pickedCountryCodes = R.map((country: Country) => country.alpha2Code, pickedCountries);
+  const pickedCountryCodes = R.map((country: Country) => country.cca2, pickedCountries);
   // List of country codes to remove - specifically countries in the same group as any picked country
   // E.g. If Romania has been picked, we want to remove Romania and Chad (but keep Monaco and Indonesia)
   const countryCodesToRemove = R.flatten(R.filter(
@@ -68,7 +68,7 @@ function removeCountriesWithSimilarFlags(countries: Country[], pickedCountries: 
     countryCodesWithSimilarFlags,
   ));
   // Remove countries whose country codes are in this list
-  return R.reject((country: Country) => R.includes(country.alpha2Code, countryCodesToRemove), countries);
+  return R.reject((country: Country) => R.includes(country.cca2, countryCodesToRemove), countries);
 }
 
 function pickCountries(countries: Country[]): Country[] {
@@ -187,7 +187,7 @@ function Quiz({ countries }: QuizProps) {
       } else {
         let message = R.last(state.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!";
         if (R.last(state.answers)?.correctCountry) {
-          message += ` It's the flag of ${R.last(state.answers)?.correctCountry.name}.`
+          message += ` It's the flag of ${R.last(state.answers)?.correctCountry.name.common}.`
         }
         toast({
           description: message,

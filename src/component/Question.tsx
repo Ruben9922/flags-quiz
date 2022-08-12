@@ -64,7 +64,7 @@ function Question({
         Score: {formatInteger(computeScores(answers, mode).totalScore)}
       </Text>
       <ReactCountryFlag
-        countryCode={currentQuestion.correctCountry.alpha2Code}
+        countryCode={currentQuestion.correctCountry.cca2}
         svg
         style={{
           width: '10em',
@@ -88,7 +88,7 @@ function Question({
             paddingY={4}
             colorScheme={computeButtonColor(answered, country, currentQuestion.correctCountry, R.last(answers)?.selectedCountry ?? null)}
           >
-            {country.name}
+            {country.name.common}
           </Button>
         ))}
       </SimpleGrid>

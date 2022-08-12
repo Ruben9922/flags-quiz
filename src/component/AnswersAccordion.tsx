@@ -40,7 +40,7 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
           <AccordionPanel pb={4}>
             <Grid templateColumns="auto 1fr 1fr" gap={10} alignItems="center">
               <ReactCountryFlag
-                countryCode={answer.correctCountry.alpha2Code}
+                countryCode={answer.correctCountry.cca2}
                 style={{
                   fontSize: "6em",
                   gridColumn: 1,
@@ -49,17 +49,17 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
               <VStack alignItems="start" spacing={0}>
                   {isAnswerCorrect(answer) ? (
                     <Text>
-                      {answer.correctCountry.name}
+                      {answer.correctCountry.name.common}
                     </Text>
                   ) : (
                     <>
                       <Text>
-                        {answer.correctCountry.name} &mdash; correct answer
+                        {answer.correctCountry.name.common} &mdash; correct answer
                       </Text>
                       <Text>
                         {answer.selectedCountry === null
                           ? "Out of time"
-                          : `${answer.selectedCountry.name} — selected answer`}
+                          : `${answer.selectedCountry.name.common} — selected answer`}
                       </Text>
                     </>
                   )}
