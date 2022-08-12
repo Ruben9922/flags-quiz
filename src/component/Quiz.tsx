@@ -59,6 +59,10 @@ function removeCountriesWithSimilarFlags(countries: Country[], pickedCountries: 
       "MC", // Monaco
       "ID", // Indonesia
     ],
+    [
+      "US", // United States
+      "UM", // United States Minor Outlying Islands
+    ],
   ];
   const pickedCountryCodes = R.map((country: Country) => country.cca2, pickedCountries);
   // List of country codes to remove - specifically countries in the same group as any picked country
