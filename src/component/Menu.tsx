@@ -1,14 +1,17 @@
 import React from "react";
 import {Button, FormControl, FormLabel, HStack, Radio, RadioGroup, Tooltip, VStack} from "@chakra-ui/react";
 import Mode from "../core/mode";
+import {InputMode} from "../core/utilities";
 
 interface MenuProps {
   mode: Mode;
   setMode: (mode: Mode) => void;
+  inputMode: InputMode;
+  setInputMode: (inputMode: InputMode) => void;
   startGame: () => void;
 }
 
-function Menu({mode, setMode, startGame}: MenuProps) {
+function Menu({mode, setMode, inputMode, setInputMode, startGame}: MenuProps) {
   return (
     <VStack spacing={4}>
       <FormControl w="auto" as="fieldset">
@@ -22,6 +25,12 @@ function Menu({mode, setMode, startGame}: MenuProps) {
             </Radio>
             <Radio value="timed">Timed</Radio>
             <Radio value="endless">Endless</Radio>
+          </HStack>
+        </RadioGroup>
+        <RadioGroup value={inputMode} onChange={setInputMode}>
+          <HStack spacing={4}>
+            <Radio value="multiple-choice">Multiple choice</Radio>
+            <Radio value="text">Text</Radio>
           </HStack>
         </RadioGroup>
       </FormControl>

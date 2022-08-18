@@ -1,5 +1,7 @@
 import humanizeDuration from "humanize-duration";
 
+export type InputMode = "multiple-choice" | "text";
+
 export const customHumanizer = humanizeDuration.humanizer({
   maxDecimalPoints: 1,
   spacer: "",

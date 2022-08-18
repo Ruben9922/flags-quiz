@@ -12,7 +12,7 @@ import {
   YAxis
 } from "react-vis";
 import 'react-vis/dist/style.css';
-import {customHumanizer, formatInteger, formatIntegerWithSign} from "../core/utilities";
+import {customHumanizer, formatInteger, formatIntegerWithSign, InputMode} from "../core/utilities";
 import {computeScores} from "../core/scoring";
 import {Box, Button, Grid, Heading, Image, SimpleGrid, Text, useColorModeValue, VStack} from "@chakra-ui/react";
 import Answer, {isAnswerCorrect} from "../core/answer";
@@ -117,15 +117,16 @@ interface SummaryProps {
   answers: Answer[];
   playAgain: () => void;
   mode: Mode;
+  inputMode: InputMode;
 }
 
-function Summary({answers, playAgain, mode}: SummaryProps) {
+function Summary({answers, playAgain, mode, inputMode}: SummaryProps) {
   type CumulativeScoreChartData = { x: number, y: number };
   const cumulativeScoreChartData = R.addIndex<number, CumulativeScoreChartData>(R.map)(
     (value, index) => ({ x: index, y: value }),
     R.reduce<Answer, number[]>(
       (acc, value) => R.append(
-        (R.isEmpty(acc) ? 0 : R.last(acc)!) + (isAnswerCorrect(value) ? 1 : 0),
+        (R.isEmpty(acc) ? 0 : R.last(acc)!) + (isAnswerCorrect(value, inputMode) ? 1 : 0),
         acc
       ),
       [0],
@@ -138,14 +139,14 @@ function Summary({answers, playAgain, mode}: SummaryProps) {
     (answer, index) => ({
       x: index + 1,
       y: answer.timeTaken === null ? null : (answer.timeTaken / 1000),
-      color: isAnswerCorrect(answer),
+      color: isAnswerCorrect(answer, inputMode),
     }),
     answers
   );
 
-  const scores = computeScores(answers, mode);
+  const scores = computeScores(answers, mode, inputMode);
 
-  const correctAnswersTimeTaken = R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer) && answer.timeTaken !== null, answers));
+  const correctAnswersTimeTaken = R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer, inputMode) && answer.timeTaken !== null, answers));
   const maxStreak = R.apply(Math.max, scores.streaks);
   const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
   const averageTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.mean(correctAnswersTimeTaken);
@@ -193,7 +194,7 @@ function Summary({answers, playAgain, mode}: SummaryProps) {
               <SimpleGrid spacing={4} columns={[1, 2, 4]}>
                 <StatisticCard
                   label="Correct answers"
-                  value={`${R.length(R.filter(isAnswerCorrect, answers))}/${R.length(answers)} (${(R.length(R.filter(isAnswerCorrect, answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})`}
+                  value={`${R.length(R.filter((answer: Answer) => isAnswerCorrect(answer, inputMode), answers))}/${R.length(answers)} (${(R.length(R.filter((answer: Answer) => isAnswerCorrect(answer, inputMode), answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})`}
                 />
                 <StatisticCard
                   label="Longest streak"
@@ -251,7 +252,7 @@ function Summary({answers, playAgain, mode}: SummaryProps) {
               </SimpleGrid>
             </MotionBox>
             <MotionBox variants={itemVariant}>
-              <AnswersAccordion answers={answers} mode={mode} />
+              <AnswersAccordion answers={answers} mode={mode} inputMode={inputMode} />
             </MotionBox>
           </MotionVStack>
         </>

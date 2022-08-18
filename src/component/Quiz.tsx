@@ -21,6 +21,7 @@ import Country from "../core/country";
 import Mode from "../core/mode";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import Question from "../core/question";
+import {InputMode} from "../core/utilities";
 
 interface QuizProps {
   countries: Country[];
@@ -34,14 +35,16 @@ interface QuizState {
   answered: boolean;
   view: View;
   mode: Mode;
+  inputMode: InputMode;
   timestamp: DOMHighResTimeStamp | null;
 }
 
 type QuizAction =
-  | { type: "answer", country: Country | null }
+  | { type: "answer", answerText: string | null }
   | { type: "resetQuestion", countries: Country[] }
   | { type: "playAgain" }
   | { type: "setMode", mode: Mode }
+  | { type: "setInputMode", inputMode: InputMode }
   | { type: "endGame" }
   | { type: "startGame", countries: Country[] };
 
@@ -107,6 +110,7 @@ const initialState: QuizState = {
   answered: false,
   view: "menu",
   mode: "classic",
+  inputMode: "multiple-choice",
   timestamp: null,
 };
 
@@ -117,8 +121,8 @@ function reducer(draft: QuizState, action: QuizAction): void {
         const answer = {
           countries: draft.currentQuestion.countries,
           correctCountry: draft.currentQuestion.correctCountry,
-          selectedCountry: action.country,
-          timeTaken: draft.timestamp === null || action.country === null ? null : (performance.now() - draft.timestamp),
+          answerText: action.answerText,
+          timeTaken: draft.timestamp === null || action.answerText === null ? null : (performance.now() - draft.timestamp),
         };
         draft.answers = R.append(answer, draft.answers);
 
@@ -139,7 +143,7 @@ function reducer(draft: QuizState, action: QuizAction): void {
       draft.answered = false;
       draft.timestamp = performance.now();
 
-      if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!)) {
+      if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!, draft.inputMode)) {
         draft.view = "summary";
       }
 
@@ -151,6 +155,10 @@ function reducer(draft: QuizState, action: QuizAction): void {
       return;
     case "setMode":
       draft.mode = action.mode;
+
+      return;
+    case "setInputMode":
+      draft.inputMode = action.inputMode;
 
       return;
     case "endGame":
@@ -177,19 +185,19 @@ function Quiz({ countries }: QuizProps) {
 
   React.useEffect(() => {
     if (!R.isEmpty(state.answers)) {
-      if (isAnswerCorrect(R.last(state.answers)!)) {
+      if (isAnswerCorrect(R.last(state.answers)!, state.inputMode)) {
         toast({
           description: "Correct!",
           status: "success",
         });
 
         // Snackbar for consecutive correct answers
-        const streak = computeStreak(state.answers);
+        const streak = computeStreak(state.answers, state.inputMode);
         if (isStreakAtThreshold(streak)) {
           setTimeout(() => toast({ description: `\u{1F389} Nice! ${streak} in a row!` }), 500);
         }
       } else {
-        let message = R.last(state.answers)?.selectedCountry === null ? "Out of time!" : "Incorrect!";
+        let message = R.last(state.answers)?.answerText === null ? "Out of time!" : "Incorrect!";
         if (R.last(state.answers)?.correctCountry) {
           message += ` It's the flag of ${R.last(state.answers)?.correctCountry.name.common}.`
         }
@@ -199,7 +207,7 @@ function Quiz({ countries }: QuizProps) {
         });
 
         // Snackbar for losing a streak
-        const prevStreak = computeStreak(R.init(state.answers));
+        const prevStreak = computeStreak(R.init(state.answers), state.inputMode);
         if (prevStreak >= 3) {
           setTimeout(() => toast({ description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!` }), 500);
         }
@@ -208,13 +216,13 @@ function Quiz({ countries }: QuizProps) {
   }, [state.answers, toast]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
-    if (isAllCorrectAchievement(state.answers)) {
+    if (isAllCorrectAchievement(state.answers, state.inputMode)) {
       toast({ description: "\u{1F389} Awesome! You got 100%!" });
     }
   }, [state.answers, toast]);
 
   React.useEffect(() => {
-    if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!)) {
+    if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.inputMode)) {
       setTimeout(() => toast({ description: "Game over!" }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
@@ -232,14 +240,14 @@ function Quiz({ countries }: QuizProps) {
 
   const onCountdownEnd = React.useCallback(
     () => {
-      dispatch({ type: "answer", country: null });
+      dispatch({ type: "answer", answerText: null });
       setTimeout(resetQuestion, 2500);
     },
     [dispatch, resetQuestion],
   );
 
-  const answer = (country: Country) => {
-    dispatch({ type: "answer", country });
+  const answer = (answerText: string) => {
+    dispatch({ type: "answer", answerText });
     pause();
   };
 
@@ -256,6 +264,8 @@ function Quiz({ countries }: QuizProps) {
         <Menu
           mode={state.mode}
           setMode={(mode: Mode) => dispatch({ type: "setMode", mode })}
+          inputMode={state.inputMode}
+          setInputMode={(inputMode: InputMode) => dispatch({ type: "setInputMode", inputMode })}
           startGame={startGame}
         />
       )}
@@ -268,6 +278,7 @@ function Quiz({ countries }: QuizProps) {
             resetQuestion={resetQuestion}
             answered={state.answered}
             mode={state.mode}
+            inputMode={state.inputMode}
             timeLeft={timeLeft}
             totalTime={initialTime}
             onCountdownEnd={onCountdownEnd}
@@ -282,6 +293,7 @@ function Quiz({ countries }: QuizProps) {
           answers={state.answers}
           playAgain={() => { dispatch({ type: "playAgain" }); }}
           mode={state.mode}
+          inputMode={state.inputMode}
         />
       )}
 

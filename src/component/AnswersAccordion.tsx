@@ -14,7 +14,7 @@ import {
   Text,
   VStack
 } from "@chakra-ui/react";
-import {customHumanizer, formatInteger} from "../core/utilities";
+import {customHumanizer, formatInteger, InputMode} from "../core/utilities";
 import React, {useState} from "react";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import {computeBaseScore} from "../core/scoring";
@@ -23,9 +23,10 @@ import Mode from "../core/mode";
 interface AnswersAccordionProps {
   answers: Answer[];
   mode: Mode;
+  inputMode: InputMode;
 }
 
-function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
+function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
   const [expandedIndices, setExpandedIndices] = useState<ExpandedIndex>([]);
 
   return (
@@ -61,7 +62,7 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
                   <Text>Question {index + 1}</Text>
                 </Box>
                 <Box flex="1" textAlign="left">
-                  <Text>{isAnswerCorrect(answer) ? "Correct \u2705" : "Incorrect \u274C"}</Text>
+                  <Text>{isAnswerCorrect(answer, inputMode) ? "Correct \u2705" : "Incorrect \u274C"}</Text>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
@@ -79,7 +80,7 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
                   marginY="5px"
                 />
                 <VStack alignItems="start" spacing={0}>
-                    {isAnswerCorrect(answer) ? (
+                    {isAnswerCorrect(answer, inputMode) ? (
                       <Text>
                         {answer.correctCountry.name.common}
                       </Text>
@@ -89,9 +90,9 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
                           {answer.correctCountry.name.common} &mdash; correct answer
                         </Text>
                         <Text>
-                          {answer.selectedCountry === null
+                          {answer.answerText === null
                             ? "Out of time"
-                            : `${answer.selectedCountry.name.common} — selected answer`}
+                            : `${answer.answerText} — selected answer`}
                         </Text>
                       </>
                     )}
@@ -101,7 +102,7 @@ function AnswersAccordion({answers, mode}: AnswersAccordionProps) {
                     <span role="img" aria-label="time">⏳</span> {answer.timeTaken === null ? "—" : customHumanizer(answer.timeTaken)}
                   </Text>
                   <Text>
-                    <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, mode))}
+                    <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, mode, inputMode))}
                   </Text>
                 </VStack>
               </Grid>
