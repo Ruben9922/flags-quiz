@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import Country from "../core/country";
 import Mode from "../core/mode";
-import Answer, {isAnswerCorrect} from "../core/answer";
+import Answer, {AnswerText, isAnswerCorrect} from "../core/answer";
 import Question from "../core/question";
 import {InputMode} from "../core/utilities";
 
@@ -40,7 +40,7 @@ interface QuizState {
 }
 
 type QuizAction =
-  | { type: "answer", answerText: string | null }
+  | { type: "answer", answerText: AnswerText }
   | { type: "resetQuestion", countries: Country[] }
   | { type: "playAgain" }
   | { type: "setMode", mode: Mode }
@@ -185,7 +185,8 @@ function Quiz({ countries }: QuizProps) {
 
   React.useEffect(() => {
     if (!R.isEmpty(state.answers)) {
-      if (isAnswerCorrect(R.last(state.answers)!, state.inputMode)) {
+      const lastAnswer = R.last(state.answers)!;
+      if (isAnswerCorrect(lastAnswer, state.inputMode)) {
         toast({
           description: "Correct!",
           status: "success",
@@ -197,10 +198,11 @@ function Quiz({ countries }: QuizProps) {
           setTimeout(() => toast({ description: `\u{1F389} Nice! ${streak} in a row!` }), 500);
         }
       } else {
-        let message = R.last(state.answers)?.answerText === null ? "Out of time!" : "Incorrect!";
-        if (R.last(state.answers)?.correctCountry) {
-          message += ` It's the flag of ${R.last(state.answers)?.correctCountry.name.common}.`
-        }
+        // todo: refactor this line
+        let message = lastAnswer.answerText.answerType === "out-of-time" ? "Out of time! " : (
+          lastAnswer.answerText.answerType === "don't-know" ? "" : "Incorrect! "
+        );
+        message += `It's the flag of ${lastAnswer.correctCountry.name.common}.`;
         toast({
           description: message,
           status: "error",
@@ -240,13 +242,13 @@ function Quiz({ countries }: QuizProps) {
 
   const onCountdownEnd = React.useCallback(
     () => {
-      dispatch({ type: "answer", answerText: null });
+      dispatch({ type: "answer", answerText: { answerType: "out-of-time" } });
       setTimeout(resetQuestion, 2500);
     },
     [dispatch, resetQuestion],
   );
 
-  const answer = (answerText: string) => {
+  const answer = (answerText: AnswerText) => {
     dispatch({ type: "answer", answerText });
     pause();
   };

@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import * as R from "ramda";
 import Timer from "./Timer";
 import {Button, HStack, IconButton, Image, Input, SimpleGrid, Text} from "@chakra-ui/react";
-import Answer from "../core/answer";
+import Answer, {AnswerText} from "../core/answer";
 import QuestionType from "../core/question";
 import Mode from "../core/mode";
 import Country from "../core/country";
@@ -14,7 +14,7 @@ interface QuestionProps {
   answers: Answer[];
   currentQuestion: QuestionType;
   answered: boolean;
-  answer: (answerText: string) => void;
+  answer: (answerText: AnswerText) => void;
   resetQuestion: () => void;
   mode: Mode;
   inputMode: InputMode;
@@ -23,16 +23,16 @@ interface QuestionProps {
   onCountdownEnd: () => void;
 }
 
-function computeButtonColor(answered: boolean, country: Country, correctCountry: Country, answerText: string | null): "blue" | "green" | "red" | "gray" {
+function computeButtonColor(answered: boolean, country: Country, correctCountry: Country, answerText: AnswerText | undefined): "blue" | "green" | "red" | "gray" {
   // todo: use R.equals instead of ===
   // todo: use isAnswerCorrect
-  if (answered && country === correctCountry && answerText === null) {
+  if (answered && country === correctCountry && answerText?.answerType !== "answered") {
     return "blue";
   }
   if (answered && country === correctCountry) {
     return "green";
   }
-  if (answered && country.name.common === answerText) {
+  if (answered && answerText?.answerType === "answered" && country.name.common === answerText.text) {
     return "red";
   }
   return "gray";
@@ -51,7 +51,7 @@ function Question({
                     onCountdownEnd,
                   }: QuestionProps) {
   const [answerText, setAnswerText] = useState("");
-  const handleClick = (answerText: string) => {
+  const handleClick = (answerText: AnswerText) => {
     answer(answerText);
     setTimeout(() => {
       setAnswerText("");
@@ -90,13 +90,13 @@ function Question({
               key={index}
               size="lg"
               disabled={answered}
-              onClick={() => handleClick(country.name.common)}
+              onClick={() => handleClick({ answerType: "answered", text: country.name.common })}
               width="250px"
               minHeight="80px"
               height="auto"
               whiteSpace="normal"
               paddingY={4}
-              colorScheme={computeButtonColor(answered, country, currentQuestion.correctCountry, R.last(answers)?.answerText ?? null)}
+              colorScheme={computeButtonColor(answered, country, currentQuestion.correctCountry, R.last(answers)?.answerText)}
             >
               {country.name.common}
             </Button>
@@ -110,7 +110,7 @@ function Question({
             onChange={event => setAnswerText(event.target.value)}
             onKeyDown={event => {
               if (!R.isEmpty(R.trim(answerText)) && event.key === "Enter") {
-                handleClick(answerText);
+                handleClick({ answerType: "answered", text: answerText });
               }
             }}
             placeholder="Answer"
@@ -120,9 +120,13 @@ function Question({
             aria-label="Submit answer"
             icon={<CheckIcon />}
             colorScheme="green"
-            onClick={() => handleClick(answerText)}
+            onClick={() => handleClick({ answerType: "answered", text: answerText })}
             disabled={R.isEmpty(R.trim(answerText)) || answered}
           />
+          {/* todo: fix button width */}
+          <Button onClick={() => handleClick({ answerType: "don't-know" })}>
+            Don't know
+          </Button>
         </HStack>
       )}
     </>

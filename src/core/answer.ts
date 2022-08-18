@@ -6,19 +6,28 @@ import {InputMode} from "./utilities";
 export default interface Answer {
   countries: Country[];
   correctCountry: Country;
-  answerText: string | null;
+  answerText: AnswerText;
   timeTaken: DOMHighResTimeStamp | null;
 }
+
+export type AnswerText =
+  | { answerType: "answered", text: string }
+  | { answerType: "don't-know" }
+  | { answerType: "out-of-time" };
 
 // todo: answer correct by looking up in similar flags list
 // todo: check against official names / other names, not just common name
 export function isAnswerCorrect(answer: Answer, inputMode: InputMode): boolean {
+  if (answer.answerText.answerType !== "answered") {
+    return false;
+  }
+
   if (inputMode === "multiple-choice") {
-    return answer.answerText !== null && R.equals(answer.correctCountry.name.common, answer.answerText);
+    return R.equals(answer.correctCountry.name.common, answer.answerText.text);
   } else {
-    return answer.answerText !== null && R.equals(
+    return R.equals(
       R.toLower(R.trim(answer.correctCountry.name.common)),
-      R.toLower(R.trim(answer.answerText)),
+      R.toLower(R.trim(answer.answerText.text)),
     );
   }
 }
