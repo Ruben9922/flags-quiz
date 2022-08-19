@@ -62,7 +62,12 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                   <Text>Question {index + 1}</Text>
                 </Box>
                 <Box flex="1" textAlign="left">
-                  <Text>{isAnswerCorrect(answer, inputMode) ? "Correct \u2705" : "Incorrect \u274C"}</Text>
+                  <Text>
+                    {isAnswerCorrect(answer, inputMode) && "Correct \u2705"}
+                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, inputMode) && "Incorrect \u274C"}
+                    {answer.answerText.answerType === "don't-know" && "Didn't know \u274C"}
+                    {answer.answerText.answerType === "out-of-time" && "Out of time \u274C"}
+                  </Text>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
@@ -89,11 +94,13 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                         <Text>
                           {answer.correctCountry.name.common} &mdash; correct answer
                         </Text>
-                        <Text>
-                          {answer.answerText === null
-                            ? "Out of time"
-                            : `${answer.answerText} — selected answer`}
-                        </Text>
+                        {answer.answerText.answerType === "answered" && (
+                          <Text>
+                            {inputMode === "multiple-choice"
+                              ? <>{answer.answerText.text} — selected answer</>
+                              : <><em>{answer.answerText.text}</em> — entered answer</>}
+                          </Text>
+                        )}
                       </>
                     )}
                 </VStack>
