@@ -124,7 +124,6 @@ function Question({
             onClick={() => handleClick({ answerType: "answered", text: answerText })}
             disabled={R.isEmpty(R.trim(answerText)) || answered}
           />
-          {/* todo: fix button width */}
           <Button onClick={() => handleClick({ answerType: "don't-know" })}>
             Don't know
           </Button>
