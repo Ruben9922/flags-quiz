@@ -115,6 +115,7 @@ function Question({
             }}
             placeholder="Answer"
             disabled={answered}
+            flex={1}
           />
           <IconButton
             aria-label="Submit answer"
