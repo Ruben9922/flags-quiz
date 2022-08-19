@@ -63,10 +63,18 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                 </Box>
                 <Box flex="1" textAlign="left">
                   <Text>
-                    {isAnswerCorrect(answer, inputMode) && "Correct \u2705"}
-                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, inputMode) && "Incorrect \u274C"}
-                    {answer.answerText.answerType === "don't-know" && "Didn't know \u274C"}
-                    {answer.answerText.answerType === "out-of-time" && "Out of time \u274C"}
+                    {isAnswerCorrect(answer, inputMode) && (
+                      <>Correct <span role="img" aria-label="check">✅</span></>
+                    )}
+                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, inputMode) && (
+                      <>Incorrect <span role="img" aria-label="cross">❌</span></>
+                    )}
+                    {answer.answerText.answerType === "don't-know" && (
+                      <>Didn't know <span role="img" aria-label="cross">❌</span></>
+                    )}
+                    {answer.answerText.answerType === "out-of-time" && (
+                      <>Out of time <span role="img" aria-label="cross">❌</span></>
+                    )}
                   </Text>
                 </Box>
                 <AccordionIcon />
