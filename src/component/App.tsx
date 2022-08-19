@@ -9,7 +9,7 @@ import "@fontsource/lato/700.css";
 import NavBar from "./NavBar";
 
 export default function App() {
-  const { loading, error, data = null } = useFetch<Country[]>("https://restcountries.com/v3.1/all?fields=name,cca2,flags", {}, []);
+  const { loading, error, data = null } = useFetch<Country[]>("https://restcountries.com/v3.1/all?fields=name,cca2,altSpellings,flags", {}, []);
 
   return (
     <ChakraProvider theme={theme}>
