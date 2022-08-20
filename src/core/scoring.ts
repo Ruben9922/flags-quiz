@@ -1,6 +1,7 @@
 import * as R from "ramda";
 import Answer, {isAnswerCorrect} from "./answer";
 import Options from "./options";
+import Country from "./country";
 
 interface Scores {
   streaks: number[];
@@ -16,24 +17,24 @@ export const allCorrectAchievementScore = 500;
 export const streakThresholds = [3];
 export const streakModulus = 5;
 
-export function computeStreak(answers: Answer[], options: Options): number {
-  return R.length(R.takeLastWhile(answer => isAnswerCorrect(answer, options), answers));
+export function computeStreak(answers: Answer[], options: Options, countries: Country[]): number {
+  return R.length(R.takeLastWhile(answer => isAnswerCorrect(answer, options, countries), answers));
 }
 
 export function isStreakAtThreshold(streak: number): boolean {
   return streak > 1 && (R.includes(streak, streakThresholds) || streak % streakModulus === 0);
 }
 
-function computeStreaks(answers: Answer[], options: Options): number[] {
+function computeStreaks(answers: Answer[], options: Options, countries: Country[]): number[] {
   return R.reduce((acc, value) =>
-      isAnswerCorrect(value, options)
+      isAnswerCorrect(value, options, countries)
         ? R.append(R.last(acc)! + 1, R.init(acc)) // Add 1 to the last streak already in the array
         : R.append(0, acc) // Create a new streak initialised to 0
     , [0], answers);
 }
 
-export function computeBaseScore(answer: Answer, options: Options): number {
-  if (!isAnswerCorrect(answer, options) || answer.timeTaken === null) {
+export function computeBaseScore(answer: Answer, options: Options, countries: Country[]): number {
+  if (!isAnswerCorrect(answer, options, countries) || answer.timeTaken === null) {
     return 0;
   }
 
@@ -44,8 +45,8 @@ export function computeBaseScore(answer: Answer, options: Options): number {
   return isTimed ? maxTimedScore / answer.timeTaken : nonTimedScore;
 }
 
-function computeTotalBaseScore(answers: Answer[], options: Options): number {
-  return R.sum(R.map(answer =>  computeBaseScore(answer, options), answers));
+function computeTotalBaseScore(answers: Answer[], options: Options, countries: Country[]): number {
+  return R.sum(R.map(answer =>  computeBaseScore(answer, options, countries), answers));
 }
 
 function computeStreakScore(streak: number): number {
@@ -64,22 +65,22 @@ function computeTotalScore(totalBaseScore: number, totalStreakScore: number, all
   return totalBaseScore + totalStreakScore + allCorrectAchievementBonus;
 }
 
-export function isAllCorrectAchievement(answers: Answer[], options: Options): boolean {
-  return R.length(answers) >= 3 && R.all(answer => isAnswerCorrect(answer, options), answers);
+export function isAllCorrectAchievement(answers: Answer[], options: Options, countries: Country[]): boolean {
+  return R.length(answers) >= 3 && R.all(answer => isAnswerCorrect(answer, options, countries), answers);
 }
 
-function computeAllCorrectAchievementBonus(answers: Answer[], options: Options): number {
-  return isAllCorrectAchievement(answers, options) ? allCorrectAchievementScore * R.length(answers) : 0;
+function computeAllCorrectAchievementBonus(answers: Answer[], options: Options, countries: Country[]): number {
+  return isAllCorrectAchievement(answers, options, countries) ? allCorrectAchievementScore * R.length(answers) : 0;
 }
 
-export function computeScores(answers: Answer[], options: Options): Scores {
-  const streaks = computeStreaks(answers, options);
+export function computeScores(answers: Answer[], options: Options, countries: Country[]): Scores {
+  const streaks = computeStreaks(answers, options, countries);
 
   // Calculate score
   // Base score is a score for answering a question, based on the time taken
-  const totalBaseScore = computeTotalBaseScore(answers, options);
+  const totalBaseScore = computeTotalBaseScore(answers, options, countries);
   const totalStreakScore = computeTotalStreakScore(streaks);
-  const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers, options);
+  const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers, options, countries);
   const totalScore = computeTotalScore(totalBaseScore, totalStreakScore, allCorrectAchievementBonus);
 
   return {

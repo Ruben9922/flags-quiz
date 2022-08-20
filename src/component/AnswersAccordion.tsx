@@ -19,13 +19,15 @@ import React, {useState} from "react";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import {computeBaseScore} from "../core/scoring";
 import Options from "../core/options";
+import Country from "../core/country";
 
 interface AnswersAccordionProps {
   answers: Answer[];
   options: Options;
+  countries: Country[];
 }
 
-function AnswersAccordion({answers, options}: AnswersAccordionProps) {
+function AnswersAccordion({answers, options, countries}: AnswersAccordionProps) {
   const [expandedIndices, setExpandedIndices] = useState<ExpandedIndex>([]);
 
   return (
@@ -62,10 +64,10 @@ function AnswersAccordion({answers, options}: AnswersAccordionProps) {
                 </Box>
                 <Box flex="1" textAlign="left">
                   <Text>
-                    {isAnswerCorrect(answer, options) && (
+                    {isAnswerCorrect(answer, options, countries) && (
                       <>Correct <span role="img" aria-label="check">✅</span></>
                     )}
-                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, options) && (
+                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, options, countries) && (
                       <>Incorrect <span role="img" aria-label="cross">❌</span></>
                     )}
                     {answer.answerText.answerType === "don't-know" && (
@@ -92,7 +94,7 @@ function AnswersAccordion({answers, options}: AnswersAccordionProps) {
                   marginY="5px"
                 />
                 <VStack alignItems="start" spacing={0}>
-                    {isAnswerCorrect(answer, options) ? (
+                    {isAnswerCorrect(answer, options, countries) ? (
                       <Text>
                         {answer.correctCountry.name.common}
                       </Text>
@@ -116,7 +118,7 @@ function AnswersAccordion({answers, options}: AnswersAccordionProps) {
                     <span role="img" aria-label="time">⏳</span> {answer.timeTaken === null ? "—" : customHumanizer(answer.timeTaken)}
                   </Text>
                   <Text>
-                    <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, options))}
+                    <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, options, countries))}
                   </Text>
                 </VStack>
               </Grid>

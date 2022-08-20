@@ -20,6 +20,7 @@ interface QuestionProps {
   timeLeft: number;
   totalTime: number;
   onCountdownEnd: () => void;
+  countries: Country[];
 }
 
 function computeButtonColor(answered: boolean, country: Country, correctCountry: Country, answerText: AnswerText | undefined): "blue" | "green" | "red" | "gray" {
@@ -47,6 +48,7 @@ function Question({
                     timeLeft,
                     totalTime,
                     onCountdownEnd,
+                    countries,
                   }: QuestionProps) {
   const [answerText, setAnswerText] = useState("");
   const handleClick = (answerText: AnswerText) => {
@@ -67,7 +69,7 @@ function Question({
         />
       )}
       <Text>
-        Score: {formatInteger(computeScores(answers, options).totalScore)}
+        Score: {formatInteger(computeScores(answers, options, countries).totalScore)}
       </Text>
       <Image
         src={currentQuestion.correctCountry.flags.svg}
@@ -103,6 +105,7 @@ function Question({
       ) : (
         <HStack spacing={2}>
           {/* todo: disable autocorrect / spellcheck  */}
+          {/* todo: focus answer input */}
           <Input
             value={answerText}
             onChange={event => setAnswerText(event.target.value)}

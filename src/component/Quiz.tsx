@@ -17,7 +17,7 @@ import {
   useToast,
   VStack
 } from "@chakra-ui/react";
-import Country from "../core/country";
+import Country, {getCountryCodesWithSimilarFlagsForCountries} from "../core/country";
 import Options, {InputMode, Mode} from "../core/options";
 import Answer, {AnswerText, isAnswerCorrect} from "../core/answer";
 import Question from "../core/question";
@@ -50,28 +50,10 @@ const initialTime = 10 * 1000;
 const interval = 50;
 
 function removeCountriesWithSimilarFlags(countries: Country[], pickedCountries: Country[]): Country[] {
-  // Using country codes only as these are probably more stable than country names
-  const countryCodesWithSimilarFlags: string[][] = [
-    [
-      "RO", // Romania
-      "TD", // Chad
-    ],
-    [
-      "MC", // Monaco
-      "ID", // Indonesia
-    ],
-    [
-      "US", // United States
-      "UM", // United States Minor Outlying Islands
-    ],
-  ];
   const pickedCountryCodes = R.map((country: Country) => country.cca2, pickedCountries);
   // List of country codes to remove - specifically countries in the same group as any picked country
   // E.g. If Romania has been picked, we want to remove Romania and Chad (but keep Monaco and Indonesia)
-  const countryCodesToRemove = R.flatten(R.filter(
-    (countryCodeGroup: string[]) => !R.isEmpty(R.intersection(pickedCountryCodes, countryCodeGroup)),
-    countryCodesWithSimilarFlags,
-  ));
+  const countryCodesToRemove = getCountryCodesWithSimilarFlagsForCountries(pickedCountryCodes);
   // Remove countries whose country codes are in this list
   return R.reject((country: Country) => R.includes(country.cca2, countryCodesToRemove), countries);
 }
@@ -143,7 +125,7 @@ function reducer(draft: QuizState, action: QuizAction): void {
       draft.answered = false;
       draft.timestamp = performance.now();
 
-      if (!R.isEmpty(draft.answers) && draft.options.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!, draft.options)) {
+      if (!R.isEmpty(draft.answers) && draft.options.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!, draft.options, action.countries)) {
         draft.view = "summary";
       }
 
@@ -186,14 +168,14 @@ function Quiz({ countries }: QuizProps) {
   React.useEffect(() => {
     if (!R.isEmpty(state.answers)) {
       const lastAnswer = R.last(state.answers)!;
-      if (isAnswerCorrect(lastAnswer, state.options)) {
+      if (isAnswerCorrect(lastAnswer, state.options, countries)) {
         toast({
           description: "Correct!",
           status: "success",
         });
 
         // Snackbar for consecutive correct answers
-        const streak = computeStreak(state.answers, state.options);
+        const streak = computeStreak(state.answers, state.options, countries);
         if (isStreakAtThreshold(streak)) {
           setTimeout(() => toast({ description: `\u{1F389} Nice! ${streak} in a row!` }), 500);
         }
@@ -209,7 +191,7 @@ function Quiz({ countries }: QuizProps) {
         });
 
         // Snackbar for losing a streak
-        const prevStreak = computeStreak(R.init(state.answers), state.options);
+        const prevStreak = computeStreak(R.init(state.answers), state.options, countries);
         if (prevStreak >= 3) {
           setTimeout(() => toast({ description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!` }), 500);
         }
@@ -218,13 +200,13 @@ function Quiz({ countries }: QuizProps) {
   }, [state.answers, state.options, toast]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
-    if (isAllCorrectAchievement(state.answers, state.options)) {
+    if (isAllCorrectAchievement(state.answers, state.options, countries)) {
       toast({ description: "\u{1F389} Awesome! You got 100%!" });
     }
   }, [state.answers, state.options, toast]);
 
   React.useEffect(() => {
-    if (state.options.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.options)) {
+    if (state.options.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.options, countries)) {
       setTimeout(() => toast({ description: "Game over!" }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
@@ -283,6 +265,7 @@ function Quiz({ countries }: QuizProps) {
             timeLeft={timeLeft}
             totalTime={initialTime}
             onCountdownEnd={onCountdownEnd}
+            countries={countries}
           />
           <Button onClick={() => setDialogOpen(true)}>
             End game
@@ -294,6 +277,7 @@ function Quiz({ countries }: QuizProps) {
           answers={state.answers}
           playAgain={() => { dispatch({ type: "playAgain" }); }}
           options={state.options}
+          countries={countries}
         />
       )}
 

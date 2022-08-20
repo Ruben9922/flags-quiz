@@ -21,6 +21,7 @@ import theme from "../theme";
 import Paper from "./Paper";
 import {motion} from "framer-motion";
 import Options from "../core/options";
+import Country from "../core/country";
 
 const MotionVStack = motion(VStack);
 const MotionBox = motion(Box);
@@ -117,15 +118,16 @@ interface SummaryProps {
   answers: Answer[];
   playAgain: () => void;
   options: Options;
+  countries: Country[];
 }
 
-function Summary({answers, playAgain, options}: SummaryProps) {
+function Summary({answers, playAgain, options, countries}: SummaryProps) {
   type CumulativeScoreChartData = { x: number, y: number };
   const cumulativeScoreChartData = R.addIndex<number, CumulativeScoreChartData>(R.map)(
     (value, index) => ({ x: index, y: value }),
     R.reduce<Answer, number[]>(
       (acc, value) => R.append(
-        (R.isEmpty(acc) ? 0 : R.last(acc)!) + (isAnswerCorrect(value, options) ? 1 : 0),
+        (R.isEmpty(acc) ? 0 : R.last(acc)!) + (isAnswerCorrect(value, options, countries) ? 1 : 0),
         acc
       ),
       [0],
@@ -138,14 +140,14 @@ function Summary({answers, playAgain, options}: SummaryProps) {
     (answer, index) => ({
       x: index + 1,
       y: answer.timeTaken === null ? null : (answer.timeTaken / 1000),
-      color: isAnswerCorrect(answer, options),
+      color: isAnswerCorrect(answer, options, countries),
     }),
     answers
   );
 
-  const scores = computeScores(answers, options);
+  const scores = computeScores(answers, options, countries);
 
-  const correctAnswersTimeTaken = R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer, options) && answer.timeTaken !== null, answers));
+  const correctAnswersTimeTaken = R.map((answer: Answer) => answer.timeTaken!, R.filter(answer => isAnswerCorrect(answer, options, countries) && answer.timeTaken !== null, answers));
   const maxStreak = R.apply(Math.max, scores.streaks);
   const minTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.apply(Math.min, correctAnswersTimeTaken);
   const averageTimeTaken = R.isEmpty(correctAnswersTimeTaken) ? null : R.mean(correctAnswersTimeTaken);
@@ -193,7 +195,7 @@ function Summary({answers, playAgain, options}: SummaryProps) {
               <SimpleGrid spacing={4} columns={[1, 2, 4]}>
                 <StatisticCard
                   label="Correct answers"
-                  value={`${R.length(R.filter((answer: Answer) => isAnswerCorrect(answer, options), answers))}/${R.length(answers)} (${(R.length(R.filter((answer: Answer) => isAnswerCorrect(answer, options), answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})`}
+                  value={`${R.length(R.filter((answer: Answer) => isAnswerCorrect(answer, options, countries), answers))}/${R.length(answers)} (${(R.length(R.filter((answer: Answer) => isAnswerCorrect(answer, options, countries), answers))/R.length(answers)).toLocaleString(undefined,{ style: 'percent' })})`}
                 />
                 <StatisticCard
                   label="Longest streak"
@@ -251,7 +253,7 @@ function Summary({answers, playAgain, options}: SummaryProps) {
               </SimpleGrid>
             </MotionBox>
             <MotionBox variants={itemVariant}>
-              <AnswersAccordion answers={answers} options={options} />
+              <AnswersAccordion answers={answers} options={options} countries={countries} />
             </MotionBox>
           </MotionVStack>
         </>

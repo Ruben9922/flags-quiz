@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import Country from "./country";
+import Country, {getCountryCodesWithSimilarFlagsForCountries} from "./country";
 import Options from "./options";
 
 // TODO: Change this so the question is part of the answer
@@ -15,11 +15,10 @@ export type AnswerText =
   | { answerType: "don't-know" }
   | { answerType: "out-of-time" };
 
-// todo: answer correct by looking up in similar flags list
 // todo: remove multiple consecutive spaces
 // todo: remove non-alphanumeric characters
 // todo: handle accented characters (ignore accents)
-export function isAnswerCorrect(answer: Answer, options: Options): boolean {
+export function isAnswerCorrect(answer: Answer, options: Options, countries: Country[]): boolean {
   if (answer.answerText.answerType !== "answered") {
     return false;
   }
@@ -27,15 +26,27 @@ export function isAnswerCorrect(answer: Answer, options: Options): boolean {
   if (options.inputMode === "multiple-choice") {
     return R.equals(answer.correctCountry.name.common, answer.answerText.text);
   } else {
+    const countryCodesWithSimilarFlags = getCountryCodesWithSimilarFlagsForCountries([answer.correctCountry.cca2]);
+    const countriesWithSimilarFlags = R.innerJoin(
+      (country, countryCode) => country.cca2 === countryCode,
+      countries,
+      countryCodesWithSimilarFlags,
+    );
+    const correctCountries = [
+      answer.correctCountry,
+      ...countriesWithSimilarFlags,
+    ];
+    const correctNames = R.chain(country => [
+      country.name.common,
+      country.name.official,
+      ...country.altSpellings,
+    ], correctCountries);
+
     // Correct if answer is equal to common name, official name or an alternative spelling
     // Ignore case, and ignore leading and trailing spaces
     return R.includes(
       R.toLower(R.trim(answer.answerText.text)),
-      R.map(correctAnswer => R.toLower(R.trim(correctAnswer)), [
-        answer.correctCountry.name.common,
-        answer.correctCountry.name.official,
-        ...answer.correctCountry.altSpellings,
-      ])
+      R.map(correctAnswer => R.toLower(R.trim(correctAnswer)), correctNames)
     );
   }
 }
