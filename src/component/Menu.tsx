@@ -1,7 +1,6 @@
 import React from "react";
 import {Button, FormControl, FormLabel, HStack, Radio, RadioGroup, Tooltip, VStack} from "@chakra-ui/react";
-import Mode from "../core/mode";
-import {InputMode} from "../core/utilities";
+import {InputMode, Mode} from "../core/options";
 
 interface MenuProps {
   mode: Mode;

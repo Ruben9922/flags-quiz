@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import Country from "./country";
-import {InputMode} from "./utilities";
+import Options from "./options";
 
 // TODO: Change this so the question is part of the answer
 export default interface Answer {
@@ -19,12 +19,12 @@ export type AnswerText =
 // todo: remove multiple consecutive spaces
 // todo: remove non-alphanumeric characters
 // todo: handle accented characters (ignore accents)
-export function isAnswerCorrect(answer: Answer, inputMode: InputMode): boolean {
+export function isAnswerCorrect(answer: Answer, options: Options): boolean {
   if (answer.answerText.answerType !== "answered") {
     return false;
   }
 
-  if (inputMode === "multiple-choice") {
+  if (options.inputMode === "multiple-choice") {
     return R.equals(answer.correctCountry.name.common, answer.answerText.text);
   } else {
     // Correct if answer is equal to common name, official name or an alternative spelling

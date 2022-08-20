@@ -14,19 +14,18 @@ import {
   Text,
   VStack
 } from "@chakra-ui/react";
-import {customHumanizer, formatInteger, InputMode} from "../core/utilities";
+import {customHumanizer, formatInteger} from "../core/utilities";
 import React, {useState} from "react";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import {computeBaseScore} from "../core/scoring";
-import Mode from "../core/mode";
+import Options from "../core/options";
 
 interface AnswersAccordionProps {
   answers: Answer[];
-  mode: Mode;
-  inputMode: InputMode;
+  options: Options;
 }
 
-function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
+function AnswersAccordion({answers, options}: AnswersAccordionProps) {
   const [expandedIndices, setExpandedIndices] = useState<ExpandedIndex>([]);
 
   return (
@@ -63,10 +62,10 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                 </Box>
                 <Box flex="1" textAlign="left">
                   <Text>
-                    {isAnswerCorrect(answer, inputMode) && (
+                    {isAnswerCorrect(answer, options) && (
                       <>Correct <span role="img" aria-label="check">✅</span></>
                     )}
-                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, inputMode) && (
+                    {answer.answerText.answerType === "answered" && !isAnswerCorrect(answer, options) && (
                       <>Incorrect <span role="img" aria-label="cross">❌</span></>
                     )}
                     {answer.answerText.answerType === "don't-know" && (
@@ -93,7 +92,7 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                   marginY="5px"
                 />
                 <VStack alignItems="start" spacing={0}>
-                    {isAnswerCorrect(answer, inputMode) ? (
+                    {isAnswerCorrect(answer, options) ? (
                       <Text>
                         {answer.correctCountry.name.common}
                       </Text>
@@ -104,7 +103,7 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                         </Text>
                         {answer.answerText.answerType === "answered" && (
                           <Text>
-                            {inputMode === "multiple-choice"
+                            {options.inputMode === "multiple-choice"
                               ? <>{answer.answerText.text} — selected answer</>
                               : <><em>{answer.answerText.text}</em> — entered answer</>}
                           </Text>
@@ -117,7 +116,7 @@ function AnswersAccordion({answers, mode, inputMode}: AnswersAccordionProps) {
                     <span role="img" aria-label="time">⏳</span> {answer.timeTaken === null ? "—" : customHumanizer(answer.timeTaken)}
                   </Text>
                   <Text>
-                    <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, mode, inputMode))}
+                    <span role="img" aria-label="score">📊</span> {formatInteger(computeBaseScore(answer, options))}
                   </Text>
                 </VStack>
               </Grid>

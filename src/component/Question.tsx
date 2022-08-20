@@ -4,10 +4,10 @@ import Timer from "./Timer";
 import {Button, HStack, IconButton, Image, Input, SimpleGrid, Text} from "@chakra-ui/react";
 import Answer, {AnswerText} from "../core/answer";
 import QuestionType from "../core/question";
-import Mode from "../core/mode";
+import Options from "../core/options";
 import Country from "../core/country";
 import {computeScores} from "../core/scoring";
-import {formatInteger, InputMode} from "../core/utilities";
+import {formatInteger} from "../core/utilities";
 import {CheckIcon} from "@chakra-ui/icons";
 
 interface QuestionProps {
@@ -16,8 +16,7 @@ interface QuestionProps {
   answered: boolean;
   answer: (answerText: AnswerText) => void;
   resetQuestion: () => void;
-  mode: Mode;
-  inputMode: InputMode;
+  options: Options;
   timeLeft: number;
   totalTime: number;
   onCountdownEnd: () => void;
@@ -44,8 +43,7 @@ function Question({
                     answered,
                     answer,
                     resetQuestion,
-                    mode,
-                    inputMode,
+                    options,
                     timeLeft,
                     totalTime,
                     onCountdownEnd,
@@ -61,7 +59,7 @@ function Question({
 
   return (
     <>
-      {mode === "timed" && (
+      {options.mode === "timed" && (
         <Timer
           timeLeft={timeLeft}
           totalTime={totalTime}
@@ -69,7 +67,7 @@ function Question({
         />
       )}
       <Text>
-        Score: {formatInteger(computeScores(answers, mode, inputMode).totalScore)}
+        Score: {formatInteger(computeScores(answers, options).totalScore)}
       </Text>
       <Image
         src={currentQuestion.correctCountry.flags.svg}
@@ -80,7 +78,7 @@ function Question({
         fit="contain"
         alt="Flag"
       />
-      {inputMode === "multiple-choice" ? (
+      {options.inputMode === "multiple-choice" ? (
         <SimpleGrid
           columns={[1, null, 2]}
           spacing={2}

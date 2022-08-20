@@ -1,7 +1,6 @@
 import * as R from "ramda";
 import Answer, {isAnswerCorrect} from "./answer";
-import Mode from "./mode";
-import {InputMode} from "./utilities";
+import Options from "./options";
 
 interface Scores {
   streaks: number[];
@@ -17,36 +16,36 @@ export const allCorrectAchievementScore = 500;
 export const streakThresholds = [3];
 export const streakModulus = 5;
 
-export function computeStreak(answers: Answer[], inputMode: InputMode): number {
-  return R.length(R.takeLastWhile(answer => isAnswerCorrect(answer, inputMode), answers));
+export function computeStreak(answers: Answer[], options: Options): number {
+  return R.length(R.takeLastWhile(answer => isAnswerCorrect(answer, options), answers));
 }
 
 export function isStreakAtThreshold(streak: number): boolean {
   return streak > 1 && (R.includes(streak, streakThresholds) || streak % streakModulus === 0);
 }
 
-function computeStreaks(answers: Answer[], inputMode: InputMode): number[] {
+function computeStreaks(answers: Answer[], options: Options): number[] {
   return R.reduce((acc, value) =>
-      isAnswerCorrect(value, inputMode)
+      isAnswerCorrect(value, options)
         ? R.append(R.last(acc)! + 1, R.init(acc)) // Add 1 to the last streak already in the array
         : R.append(0, acc) // Create a new streak initialised to 0
     , [0], answers);
 }
 
-export function computeBaseScore(answer: Answer, mode: Mode, inputMode: InputMode): number {
-  if (!isAnswerCorrect(answer, inputMode) || answer.timeTaken === null) {
+export function computeBaseScore(answer: Answer, options: Options): number {
+  if (!isAnswerCorrect(answer, options) || answer.timeTaken === null) {
     return 0;
   }
 
-  const isTimed = mode === "timed";
+  const isTimed = options.mode === "timed";
   const maxTimedScore = 1000000;
   const nonTimedScore = 500;
 
   return isTimed ? maxTimedScore / answer.timeTaken : nonTimedScore;
 }
 
-function computeTotalBaseScore(answers: Answer[], mode: Mode, inputMode: InputMode): number {
-  return R.sum(R.map(answer =>  computeBaseScore(answer, mode, inputMode), answers));
+function computeTotalBaseScore(answers: Answer[], options: Options): number {
+  return R.sum(R.map(answer =>  computeBaseScore(answer, options), answers));
 }
 
 function computeStreakScore(streak: number): number {
@@ -65,22 +64,22 @@ function computeTotalScore(totalBaseScore: number, totalStreakScore: number, all
   return totalBaseScore + totalStreakScore + allCorrectAchievementBonus;
 }
 
-export function isAllCorrectAchievement(answers: Answer[], inputMode: InputMode): boolean {
-  return R.length(answers) >= 3 && R.all(answer => isAnswerCorrect(answer, inputMode), answers);
+export function isAllCorrectAchievement(answers: Answer[], options: Options): boolean {
+  return R.length(answers) >= 3 && R.all(answer => isAnswerCorrect(answer, options), answers);
 }
 
-function computeAllCorrectAchievementBonus(answers: Answer[], inputMode: InputMode): number {
-  return isAllCorrectAchievement(answers, inputMode) ? allCorrectAchievementScore * R.length(answers) : 0;
+function computeAllCorrectAchievementBonus(answers: Answer[], options: Options): number {
+  return isAllCorrectAchievement(answers, options) ? allCorrectAchievementScore * R.length(answers) : 0;
 }
 
-export function computeScores(answers: Answer[], mode: Mode, inputMode: InputMode): Scores {
-  const streaks = computeStreaks(answers, inputMode);
+export function computeScores(answers: Answer[], options: Options): Scores {
+  const streaks = computeStreaks(answers, options);
 
   // Calculate score
   // Base score is a score for answering a question, based on the time taken
-  const totalBaseScore = computeTotalBaseScore(answers, mode, inputMode);
+  const totalBaseScore = computeTotalBaseScore(answers, options);
   const totalStreakScore = computeTotalStreakScore(streaks);
-  const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers, inputMode);
+  const allCorrectAchievementBonus = computeAllCorrectAchievementBonus(answers, options);
   const totalScore = computeTotalScore(totalBaseScore, totalStreakScore, allCorrectAchievementBonus);
 
   return {

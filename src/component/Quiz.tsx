@@ -18,10 +18,9 @@ import {
   VStack
 } from "@chakra-ui/react";
 import Country from "../core/country";
-import Mode from "../core/mode";
+import Options, {InputMode, Mode} from "../core/options";
 import Answer, {AnswerText, isAnswerCorrect} from "../core/answer";
 import Question from "../core/question";
-import {InputMode} from "../core/utilities";
 
 interface QuizProps {
   countries: Country[];
@@ -34,8 +33,7 @@ interface QuizState {
   answers: Answer[];
   answered: boolean;
   view: View;
-  mode: Mode;
-  inputMode: InputMode;
+  options: Options;
   timestamp: DOMHighResTimeStamp | null;
 }
 
@@ -109,8 +107,10 @@ const initialState: QuizState = {
   answers: [],
   answered: false,
   view: "menu",
-  mode: "classic",
-  inputMode: "multiple-choice",
+  options: {
+    mode: "classic",
+    inputMode: "multiple-choice",
+  },
   timestamp: null,
 };
 
@@ -143,7 +143,7 @@ function reducer(draft: QuizState, action: QuizAction): void {
       draft.answered = false;
       draft.timestamp = performance.now();
 
-      if (!R.isEmpty(draft.answers) && draft.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!, draft.inputMode)) {
+      if (!R.isEmpty(draft.answers) && draft.options.mode === "classic" && !isAnswerCorrect(R.last(draft.answers)!, draft.options)) {
         draft.view = "summary";
       }
 
@@ -154,11 +154,11 @@ function reducer(draft: QuizState, action: QuizAction): void {
 
       return;
     case "setMode":
-      draft.mode = action.mode;
+      draft.options.mode = action.mode;
 
       return;
     case "setInputMode":
-      draft.inputMode = action.inputMode;
+      draft.options.inputMode = action.inputMode;
 
       return;
     case "endGame":
@@ -186,14 +186,14 @@ function Quiz({ countries }: QuizProps) {
   React.useEffect(() => {
     if (!R.isEmpty(state.answers)) {
       const lastAnswer = R.last(state.answers)!;
-      if (isAnswerCorrect(lastAnswer, state.inputMode)) {
+      if (isAnswerCorrect(lastAnswer, state.options)) {
         toast({
           description: "Correct!",
           status: "success",
         });
 
         // Snackbar for consecutive correct answers
-        const streak = computeStreak(state.answers, state.inputMode);
+        const streak = computeStreak(state.answers, state.options);
         if (isStreakAtThreshold(streak)) {
           setTimeout(() => toast({ description: `\u{1F389} Nice! ${streak} in a row!` }), 500);
         }
@@ -209,26 +209,26 @@ function Quiz({ countries }: QuizProps) {
         });
 
         // Snackbar for losing a streak
-        const prevStreak = computeStreak(R.init(state.answers), state.inputMode);
+        const prevStreak = computeStreak(R.init(state.answers), state.options);
         if (prevStreak >= 3) {
           setTimeout(() => toast({ description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!` }), 500);
         }
       }
     }
-  }, [state.answers, state.inputMode, toast]);
+  }, [state.answers, state.options, toast]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
-    if (isAllCorrectAchievement(state.answers, state.inputMode)) {
+    if (isAllCorrectAchievement(state.answers, state.options)) {
       toast({ description: "\u{1F389} Awesome! You got 100%!" });
     }
-  }, [state.answers, state.inputMode, toast]);
+  }, [state.answers, state.options, toast]);
 
   React.useEffect(() => {
-    if (state.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.inputMode)) {
+    if (state.options.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.options)) {
       setTimeout(() => toast({ description: "Game over!" }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
-  }, [state.answers, state.inputMode, state.mode, toast, displayAllCorrectSnackbar]);
+  }, [state.answers, state.options, toast, displayAllCorrectSnackbar]);
 
   const startGame = () => {
     dispatch({ type: "startGame", countries });
@@ -264,9 +264,9 @@ function Quiz({ countries }: QuizProps) {
     <>
       {state.view === "menu" && (
         <Menu
-          mode={state.mode}
+          mode={state.options.mode}
           setMode={(mode: Mode) => dispatch({ type: "setMode", mode })}
-          inputMode={state.inputMode}
+          inputMode={state.options.inputMode}
           setInputMode={(inputMode: InputMode) => dispatch({ type: "setInputMode", inputMode })}
           startGame={startGame}
         />
@@ -279,8 +279,7 @@ function Quiz({ countries }: QuizProps) {
             answer={answer}
             resetQuestion={resetQuestion}
             answered={state.answered}
-            mode={state.mode}
-            inputMode={state.inputMode}
+            options={state.options}
             timeLeft={timeLeft}
             totalTime={initialTime}
             onCountdownEnd={onCountdownEnd}
@@ -294,8 +293,7 @@ function Quiz({ countries }: QuizProps) {
         <Summary
           answers={state.answers}
           playAgain={() => { dispatch({ type: "playAgain" }); }}
-          mode={state.mode}
-          inputMode={state.inputMode}
+          options={state.options}
         />
       )}
 
