@@ -197,20 +197,20 @@ function Quiz({ countries }: QuizProps) {
         }
       }
     }
-  }, [state.answers, state.options, toast]);
+  }, [countries, state.answers, state.options, toast]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
     if (isAllCorrectAchievement(state.answers, state.options, countries)) {
       toast({ description: "\u{1F389} Awesome! You got 100%!" });
     }
-  }, [state.answers, state.options, toast]);
+  }, [countries, state.answers, state.options, toast]);
 
   React.useEffect(() => {
     if (state.options.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.options, countries)) {
       setTimeout(() => toast({ description: "Game over!" }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
-  }, [state.answers, state.options, toast, displayAllCorrectSnackbar]);
+  }, [countries, state.answers, state.options, toast, displayAllCorrectSnackbar]);
 
   const startGame = () => {
     dispatch({ type: "startGame", countries });
