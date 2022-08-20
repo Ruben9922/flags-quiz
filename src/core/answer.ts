@@ -1,6 +1,7 @@
 import * as R from "ramda";
 import Country, {getCountryCodesWithSimilarFlagsForCountries} from "./country";
 import Options from "./options";
+import {collapseSpaces} from "./utilities";
 
 // TODO: Change this so the question is part of the answer
 export default interface Answer {
@@ -15,7 +16,6 @@ export type AnswerText =
   | { answerType: "don't-know" }
   | { answerType: "out-of-time" };
 
-// todo: remove multiple consecutive spaces
 // todo: remove non-alphanumeric characters
 // todo: handle accented characters (ignore accents)
 export function isAnswerCorrect(answer: Answer, options: Options, countries: Country[]): boolean {
@@ -45,8 +45,8 @@ export function isAnswerCorrect(answer: Answer, options: Options, countries: Cou
     // Correct if answer is equal to common name, official name or an alternative spelling
     // Ignore case, and ignore leading and trailing spaces
     return R.includes(
-      R.toLower(R.trim(answer.answerText.text)),
-      R.map(correctAnswer => R.toLower(R.trim(correctAnswer)), correctNames)
+      R.toLower(collapseSpaces(answer.answerText.text)),
+      R.map(correctAnswer => R.toLower(collapseSpaces(correctAnswer)), correctNames)
     );
   }
 }

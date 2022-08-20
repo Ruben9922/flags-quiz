@@ -1,4 +1,5 @@
 import humanizeDuration from "humanize-duration";
+import * as R from "ramda";
 
 export const customHumanizer = humanizeDuration.humanizer({
   maxDecimalPoints: 1,
@@ -30,3 +31,11 @@ export const formatIntegerWithSign = (x: number): string => x.toLocaleString(und
   maximumFractionDigits: 0,
   signDisplay: "always",
 });
+
+export function collapseSpaces(string: string): string {
+  return R.pipe(
+    R.split(" "),
+    R.filter(token => token !== ""),
+    R.join(" "),
+  )(string);
+}
