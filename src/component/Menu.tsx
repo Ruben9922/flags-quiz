@@ -21,7 +21,7 @@ interface MenuProps {
 
 function Menu({mode, setMode, inputMode, setInputMode, startGame}: MenuProps) {
   return (
-    <VStack spacing={4}>
+    <VStack spacing={4} align="start">
       <FormControl w="auto" as="fieldset">
         <FormLabel as="legend">Game mode</FormLabel>
         <RadioGroup value={mode} onChange={setMode}>
@@ -45,7 +45,7 @@ function Menu({mode, setMode, inputMode, setInputMode, startGame}: MenuProps) {
           </HStack>
         </RadioGroup>
       </FormControl>
-      <Button onClick={startGame}>Start game</Button>
+      <Button onClick={startGame} alignSelf="center">Start game</Button>
     </VStack>
   );
 }

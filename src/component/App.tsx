@@ -1,5 +1,12 @@
 import React from "react";
-import {Alert, AlertIcon, ChakraProvider, CircularProgress, Container, VStack} from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  ChakraProvider,
+  CircularProgress,
+  Container,
+  VStack
+} from "@chakra-ui/react";
 import {useFetch} from "use-http";
 import Quiz from "./Quiz";
 import Country from "../core/country";
@@ -29,7 +36,7 @@ export default function App() {
           </Container>
         )}
         {data && (
-          <Container maxW="container.lg">
+          <Container maxW="container.lg" centerContent>
             <Quiz countries={data} />
           </Container>
         )}

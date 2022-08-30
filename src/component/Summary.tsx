@@ -14,7 +14,17 @@ import {
 import 'react-vis/dist/style.css';
 import {customHumanizer, formatInteger, formatIntegerWithSign} from "../core/utilities";
 import {computeScores} from "../core/scoring";
-import {Box, Button, Grid, Heading, Image, SimpleGrid, Text, useColorModeValue, VStack} from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Grid,
+  Heading,
+  Image,
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+  VStack
+} from "@chakra-ui/react";
 import Answer, {isAnswerCorrect} from "../core/answer";
 import AnswersAccordion from "./AnswersAccordion";
 import theme from "../theme";
