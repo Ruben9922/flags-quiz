@@ -14,7 +14,10 @@ import theme from "../theme";
 import "@fontsource/lato/400.css";
 import "@fontsource/lato/700.css";
 import NavBar from "./NavBar";
+import ReactGA from "react-ga4";
 
+ReactGA.initialize("G-9MFVCEED7E");
+ReactGA.send("pageview");
 export default function App() {
   const { loading, error, data = null } = useFetch<Country[]>("https://restcountries.com/v3.1/all?fields=name,cca2,altSpellings,flags", {}, []);
 
