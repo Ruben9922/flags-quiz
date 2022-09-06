@@ -23,6 +23,7 @@ import Country, {getCountryCodesWithSimilarFlagsForCountries} from "../core/coun
 import Options, {InputMode, Mode} from "../core/options";
 import Answer, {AnswerText, isAnswerCorrect} from "../core/answer";
 import Question from "../core/question";
+import hash from "object-hash";
 
 interface QuizProps {
   countries: Country[];
@@ -161,6 +162,7 @@ function reducer(draft: QuizState, action: QuizAction): void {
 function Quiz({ countries }: QuizProps) {
   const [state, dispatch] = useImmerReducer(reducer, initialState);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [prevToastId, setPrevToastId] = React.useState<string | null>(null);
 
   const [timeLeft, { start, pause }] = useCountDown(initialTime, interval);
   const toast = useToast();
@@ -180,42 +182,48 @@ function Quiz({ countries }: QuizProps) {
   }, [toast]);
 
   React.useEffect(() => {
-    if (!R.isEmpty(state.answers)) {
-      const lastAnswer = R.last(state.answers)!;
-      if (isAnswerCorrect(lastAnswer, state.options, countries)) {
-        displayUniqueToast(answerResultToastIdRef, {
-          description: "Correct!",
-          status: "success",
-        });
+    if (hash(state.answers) !== prevToastId) {
+      if (!R.isEmpty(state.answers)) {
+        const lastAnswer = R.last(state.answers)!;
+        if (isAnswerCorrect(lastAnswer, state.options, countries)) {
+          displayUniqueToast(answerResultToastIdRef, {
+            description: "Correct!",
+            status: "success",
+          });
 
-        // Snackbar for consecutive correct answers
-        const streak = computeStreak(state.answers, state.options, countries);
-        if (isStreakAtThreshold(streak)) {
-          setTimeout(() => displayUniqueToast(streakToastIdRef, {
-            description: `\u{1F389} Nice! ${streak} in a row!`,
-          }), 500);
-        }
-      } else {
-        // todo: refactor this line
-        let message = lastAnswer.answerText.answerType === "out-of-time" ? "Out of time! " : (
-          lastAnswer.answerText.answerType === "don't-know" ? "" : "Incorrect! "
-        );
-        message += `It's the flag of ${lastAnswer.correctCountry.name.common}.`;
-        displayUniqueToast(answerResultToastIdRef, {
-          description: message,
-          status: "error",
-        });
+          // Snackbar for consecutive correct answers
+          const streak = computeStreak(state.answers, state.options, countries);
+          if (isStreakAtThreshold(streak)) {
+            setTimeout(() => displayUniqueToast(streakToastIdRef, {
+              description: `\u{1F389} Nice! ${streak} in a row!`,
+            }), 500);
+          }
+        } else {
+          if (hash(state.answers) !== prevToastId) {
+            // todo: refactor this line
+            let message = lastAnswer.answerText.answerType === "out-of-time" ? "Out of time! " : (
+              lastAnswer.answerText.answerType === "don't-know" ? "" : "Incorrect! "
+            );
+            message += `It's the flag of ${lastAnswer.correctCountry.name.common}.`;
+            displayUniqueToast(answerResultToastIdRef, {
+              description: message,
+              status: "error",
+            });
+          }
 
-        // Snackbar for losing a streak
-        const prevStreak = computeStreak(R.init(state.answers), state.options, countries);
-        if (prevStreak >= 3) {
-          setTimeout(() => displayUniqueToast(streakToastIdRef, {
-            description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!`,
-          }), 500);
+          // Snackbar for losing a streak
+          const prevStreak = computeStreak(R.init(state.answers), state.options, countries);
+          if (prevStreak >= 3) {
+            setTimeout(() => displayUniqueToast(streakToastIdRef, {
+              description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!`,
+            }), 500);
+          }
         }
       }
     }
-  }, [countries, displayUniqueToast, state.answers, state.options]);
+
+    setPrevToastId(hash(state.answers));
+  }, [countries, displayUniqueToast, prevToastId, state.answers, state.options]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
     if (isAllCorrectAchievement(state.answers, state.options, countries)) {
@@ -226,13 +234,18 @@ function Quiz({ countries }: QuizProps) {
   }, [countries, state.answers, state.options, toast]);
 
   React.useEffect(() => {
-    if (state.options.mode === "classic" && !R.isEmpty(state.answers) && !isAnswerCorrect(R.last(state.answers)!, state.options, countries)) {
+    if (hash(state.answers) !== prevToastId
+      && state.options.mode === "classic"
+      && !R.isEmpty(state.answers)
+      && !isAnswerCorrect(R.last(state.answers)!, state.options, countries)) {
       setTimeout(() => toast({
         description: "Game over!",
       }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
-  }, [countries, state.answers, state.options, toast, displayAllCorrectSnackbar]);
+
+    setPrevToastId(hash(state.answers));
+  }, [countries, state.answers, state.options, toast, displayAllCorrectSnackbar, prevToastId]);
 
   const startGame = () => {
     dispatch({ type: "startGame", countries });
