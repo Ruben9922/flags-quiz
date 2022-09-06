@@ -199,17 +199,15 @@ function Quiz({ countries }: QuizProps) {
             }), 500);
           }
         } else {
-          if (hash(state.answers) !== prevToastId) {
-            // todo: refactor this line
-            let message = lastAnswer.answerText.answerType === "out-of-time" ? "Out of time! " : (
-              lastAnswer.answerText.answerType === "don't-know" ? "" : "Incorrect! "
-            );
-            message += `It's the flag of ${lastAnswer.correctCountry.name.common}.`;
-            displayUniqueToast(answerResultToastIdRef, {
-              description: message,
-              status: "error",
-            });
-          }
+          // todo: refactor this line
+          let message = lastAnswer.answerText.answerType === "out-of-time" ? "Out of time! " : (
+            lastAnswer.answerText.answerType === "don't-know" ? "" : "Incorrect! "
+          );
+          message += `It's the flag of ${lastAnswer.correctCountry.name.common}.`;
+          displayUniqueToast(answerResultToastIdRef, {
+            description: message,
+            status: "error",
+          });
 
           // Snackbar for losing a streak
           const prevStreak = computeStreak(R.init(state.answers), state.options, countries);
