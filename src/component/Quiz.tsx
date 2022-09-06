@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React from "react";
 import {useImmerReducer} from "use-immer";
 import * as R from "ramda";
 import QuestionComponent from "./Question";
@@ -14,9 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay,
   Button,
-  ToastId,
   useToast,
-  UseToastOptions,
   VStack
 } from "@chakra-ui/react";
 import Country, {getCountryCodesWithSimilarFlagsForCountries} from "../core/country";
@@ -169,24 +167,12 @@ function Quiz({ countries }: QuizProps) {
 
   const cancelRef = React.useRef(null);
 
-  const answerResultToastIdRef = React.useRef<ToastId | undefined>();
-  const streakToastIdRef = React.useRef<ToastId | undefined>();
-
-  // Close existing toast with the given ref, open new toast and update ref, so it refers to the new
-  // toast
-  const displayUniqueToast = useCallback((ref: React.MutableRefObject<ToastId | undefined>, options?: UseToastOptions) => {
-    if (ref.current) {
-      toast.close(ref.current);
-    }
-    ref.current = toast(options);
-  }, [toast]);
-
   React.useEffect(() => {
     if (hash(state.answers) !== prevToastId) {
       if (!R.isEmpty(state.answers)) {
         const lastAnswer = R.last(state.answers)!;
         if (isAnswerCorrect(lastAnswer, state.options, countries)) {
-          displayUniqueToast(answerResultToastIdRef, {
+          toast( {
             description: "Correct!",
             status: "success",
           });
@@ -194,8 +180,8 @@ function Quiz({ countries }: QuizProps) {
           // Snackbar for consecutive correct answers
           const streak = computeStreak(state.answers, state.options, countries);
           if (isStreakAtThreshold(streak)) {
-            setTimeout(() => displayUniqueToast(streakToastIdRef, {
-              description: `\u{1F389} Nice! ${streak} in a row!`,
+            setTimeout(() => toast({
+              description: `\u{1F389} Nice! ${streak} in a row!`
             }), 500);
           }
         } else {
@@ -204,7 +190,7 @@ function Quiz({ countries }: QuizProps) {
             lastAnswer.answerText.answerType === "don't-know" ? "" : "Incorrect! "
           );
           message += `It's the flag of ${lastAnswer.correctCountry.name.common}.`;
-          displayUniqueToast(answerResultToastIdRef, {
+          toast( {
             description: message,
             status: "error",
           });
@@ -212,8 +198,8 @@ function Quiz({ countries }: QuizProps) {
           // Snackbar for losing a streak
           const prevStreak = computeStreak(R.init(state.answers), state.options, countries);
           if (prevStreak >= 3) {
-            setTimeout(() => displayUniqueToast(streakToastIdRef, {
-              description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!`,
+            setTimeout(() => toast({
+              description: `\u{1F622} Awh! You just lost your streak of ${prevStreak}!`
             }), 500);
           }
         }
@@ -221,13 +207,11 @@ function Quiz({ countries }: QuizProps) {
     }
 
     setPrevToastId(hash(state.answers));
-  }, [countries, displayUniqueToast, prevToastId, state.answers, state.options]);
+  }, [countries, prevToastId, state.answers, state.options, toast]);
 
   const displayAllCorrectSnackbar = React.useCallback(() => {
     if (isAllCorrectAchievement(state.answers, state.options, countries)) {
-      toast({
-        description: "\u{1F389} Awesome! You got 100%!",
-      });
+      toast({ description: "\u{1F389} Awesome! You got 100%!" });
     }
   }, [countries, state.answers, state.options, toast]);
 
@@ -236,9 +220,7 @@ function Quiz({ countries }: QuizProps) {
       && state.options.mode === "classic"
       && !R.isEmpty(state.answers)
       && !isAnswerCorrect(R.last(state.answers)!, state.options, countries)) {
-      setTimeout(() => toast({
-        description: "Game over!",
-      }), 1500);
+      setTimeout(() => toast({ description: "Game over!" }), 1500);
       setTimeout(displayAllCorrectSnackbar, 2000);
     }
 
@@ -271,9 +253,7 @@ function Quiz({ countries }: QuizProps) {
   const endGame = () => {
     setDialogOpen(false);
     dispatch({ type: "endGame" });
-    toast({
-      description: "Game over!"
-    });
+    toast({ description: "Game over!" });
     setTimeout(displayAllCorrectSnackbar, 500);
   };
 
